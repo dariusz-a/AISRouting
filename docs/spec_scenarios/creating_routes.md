@@ -44,6 +44,40 @@ Given AIS CSV files are available and validated and a vessel and a valid time ra
   When the instructor clicks the "Preview/Edit Waypoints" control in the Route Actions panel.
   Then a modal with text "Preview/edit not available" is shown and an OK button closes the modal.
 
+## Critical Flow: Generate RouteTemplate from AIS track successfully — NHP Scenarios
+
+Reference: the happy-path baseline is the existing scenario "Generate RouteTemplate from AIS track successfully" in this file; do not duplicate it. The scenarios below cover high-impact non-happy paths for that critical flow.
+
+@critical @nhp @validation
+Scenario: Fail generation when AIS CSV missing required 'Latitude' column
+    Given the instructor user is on the Create Route page with AIS CSV file `outputFolder/135792468/track.csv` present that lacks a 'Latitude' header and the instructor has permission to read the file
+    When the instructor clicks the "Create Route" button in the Ship Actions toolbar
+    Then an error banner with exact text "CSV format invalid: missing 'Latitude' column" is visible and no RouteTemplate is created in memory
+
+@critical @nhp @auth @timeout
+Scenario: Show session expired error when generation started with expired session
+    Given the instructor user is on the Create Route page with AIS CSV files for MMSI "135792468" present in folder `outputFolder/135792468/` and the user's session token is expired
+    When the instructor clicks the "Create Route" button
+    Then an error banner with exact text "Your session has expired. Please sign in again." is visible and no RouteTemplate is created and the Create Route button remains enabled
+
+@critical @nhp @permission
+Scenario: Show explicit error when AIS files cannot be read due to permission denial
+    Given the instructor user is on the Create Route page and folder `outputFolder/135792468/` exists but the application lacks read permission to that folder
+    When the instructor clicks the "Create Route" button
+    Then an error dialog with exact text "Insufficient permission to read AIS files" is displayed with a link labeled "Choose another location" and the RouteTemplate remains unsaved in memory
+
+@critical @nhp @timeout
+Scenario: Show timeout when route generation exceeds SLO (30s)
+    Given the instructor user is on the Create Route page with AIS CSV files for MMSI "135792468" present in folder `outputFolder/135792468/` and generation is simulated to exceed 30 seconds
+    When the instructor clicks the "Create Route" button
+    Then a loading spinner is visible in the Ship Actions toolbar and after 30 seconds an error banner with exact text "Route generation timed out. Try again or contact support." is visible and the Create Route button is re-enabled and no RouteTemplate is created
+
+# Coverage notes:
+- Happy-path baseline: see the existing "Generate RouteTemplate from AIS track successfully" scenario in this file.
+- Negative/edge scenarios include validation (missing CSV column), authorization/timeout (expired session), permission denial (read access), and long-running timeout (SLO breach).
+- All scenarios reference MMSI "135792468" and `outputFolder/135792468/` consistent with existing scenarios and test fixtures.
+- Each scenario uses exactly one Given, one When, and one Then; additional state/outcomes are expressed using And-style clauses on the same lines where required.
+
 ## Coverage Notes
 - All scenarios reference MMSI "135792468" consistent with prior examples in this feature and use explicit file paths and timestamps so automated tests can prepare the filesystem state beforehand.
 - Role: the actor is the instructor; write and generate permissions are explicitly stated where required.
