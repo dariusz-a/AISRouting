@@ -1,0 +1,11 @@
+﻿<RouteTemplates>
+  <RouteTemplate Name="Route1" ColorR="1" ColorG="124" ColorB="139">
+    <WayPoint Name="" Lat="0.725930510131261" Lon="-0.527682659006333" Alt="0" Speed="30.8666667938232" ETA="0" Delay="0" Mode="Cruise" TrackMode="Track" Heading="0" PortXTE="20" StbdXTE="20" MinSpeed="0" MaxSpeed="30.8666667" />
+    <WayPoint Name="" Lat="0.725931625100527" Lon="-0.527681158896355" Alt="5000" Speed="18.0055561065674" ETA="0" Delay="0" Mode="Cruise" TrackMode="Track" Heading="0" PortXTE="20" StbdXTE="20" MinSpeed="0" MaxSpeed="30.8666667" />
+    <WayPoint Name="" Lat="0.7259329562721" Lon="-0.52767937149006" Alt="0" Speed="5.14444446563721" ETA="0" Delay="0" Mode="Cruise" TrackMode="Track" Heading="0" PortXTE="20" StbdXTE="20" MinSpeed="0" MaxSpeed="30.8666667" />
+    <WayPoint Name="" Lat="0.726050553133296" Lon="-0.527509260671782" Alt="0" Speed="5.14444446563721" ETA="0" Delay="0" Mode="Cruise" TrackMode="Track" Heading="0" PortXTE="20" StbdXTE="20" MinSpeed="0" MaxSpeed="30.8666667" />
+    <WayPoint Name="" Lat="0.726157662336126" Lon="-0.527477733701863" Alt="0" Speed="5.14444446563721" ETA="0" Delay="0" Mode="Cruise" TrackMode="Track" Heading="0" PortXTE="20" StbdXTE="20" MinSpeed="0" MaxSpeed="30.8666667" />
+    <WayPoint Name="" Lat="0.726215135891914" Lon="-0.527746355930423" Alt="0" Speed="5.14444446563721" ETA="0" Delay="0" Mode="Cruise" TrackMode="Track" Heading="0" PortXTE="20" StbdXTE="20" MinSpeed="0" MaxSpeed="30.8666667" />
+    <WayPoint Name="" Lat="0.726213703759084" Lon="-0.527749861231684" Alt="0" Speed="5.14444446563721" ETA="0" Delay="0" Mode="Cruise" TrackMode="Track" Heading="0" PortXTE="20" StbdXTE="20" MinSpeed="0" MaxSpeed="30.8666667" />
+  </RouteTemplate>
+</RouteTemplates>
