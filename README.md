@@ -1,5 +1,7 @@
 # **GenAI-Assisted TDD for Developers**
 
+PBI related to this work item: [PBI-410975](https://maritimesim.visualstudio.com/Nemo/_workitems/edit/410975)
+
 | Context | Audience: Mid-level & Senior Developers (3–4 per team) Environment: Local (VS Code \+ Git \+ GitHub Copilot) Workflow: 7-Step Iterative TDD Chain (Spec → Design → Test → Code) Mode: 70% Hands-on / 30% Reasoning  |
 | :---: | :---: |
 
