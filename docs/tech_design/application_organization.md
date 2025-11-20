@@ -216,6 +216,7 @@ public static class Helper
 {
     /// <summary>
     /// Scans root folder for MMSI subfolders containing AIS data.
+    /// Checks for CSV file existence by filename only - does NOT load content.
     /// </summary>
     /// <param name="rootPath">Root folder containing MMSI subfolders</param>
     /// <returns>List of available MMSI numbers</returns>
@@ -228,6 +229,8 @@ public static class Helper
 
     /// <summary>
     /// Loads and filters AIS positions for a vessel within time interval.
+    /// This method actually loads CSV file content - only called when Process! button clicked.
+    /// CSV files may be gigabytes in size, so this is deferred until necessary.
     /// </summary>
     public static IReadOnlyList<ShipState> LoadShipStates(string vesselFolder, TimeInterval interval);
 

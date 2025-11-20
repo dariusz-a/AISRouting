@@ -188,12 +188,14 @@ UI: Calls MainViewModel.BrowseInputFolderCommand
 ↓
 ViewModel: Sets InputFolder property → calls Helper.GetAvailableMmsi(inputFolder)
 ↓
-Helper: Scans folder for numeric subfolders with CSV files
+Helper: Scans folder for numeric subfolders
+       Checks for CSV file EXISTENCE (filenames only, does NOT load content)
+       Examines CSV filenames to determine date ranges
        Returns: [205196000, 123456000, 987654000]
 ↓
 ViewModel: Sets AvailableMmsi property → triggers UI update
 ↓
-UI: Populates ship table with MMSI rows
+UI: Populates ship table with MMSI rows and available date ranges
 ```
 
 **Step 2: Ship Selection**
@@ -212,7 +214,7 @@ ViewModel: Updates SelectedShip property → triggers UI update
 UI: Displays ship details, enables time pickers with min/max dates
 ```
 
-**Step 3: Load Positions**
+**Step 3: Load Positions** (triggered by Process! button - CSV content loaded here)
 ```
 User Action: Sets time interval (2025-03-15 00:00 to 12:00) and clicks "Process!"
 ↓
@@ -222,12 +224,15 @@ ViewModel: Calls Helper.LoadShipStates(
                "input/205196000",
                new TimeInterval(start: 2025-03-15T00:00:00Z, end: 2025-03-15T12:00:00Z))
 ↓
-Helper: 1. Identifies CSV files in date range (2025-03-15.csv)
-        2. Calls CsvParser.ParsePositions("input/205196000/2025-03-15.csv")
+Helper: 1. Identifies CSV files in date range by filename (2025-03-15.csv)
+        2. **NOW loads CSV content** - Calls CsvParser.ParsePositions("input/205196000/2025-03-15.csv")
         3. Filters positions by timestamp within interval
         4. Returns: List<ShipState> (e.g., 1,234 positions)
 ↓
 ViewModel: Stores positions in memory
+
+Note: CSV files may be gigabytes in size. This is why loading is deferred 
+until Process! button, after user selects specific time interval to minimize data loaded.
 ```
 
 **Step 4: Optimize Track**
@@ -321,7 +326,8 @@ public static IReadOnlyList<long> GetAvailableMmsi(string rootPath)
         if (long.TryParse(folderName, out long mmsi) && 
             mmsi >= 100000000 && mmsi <= 999999999)
         {
-            // Check for at least one CSV file
+            // Check for at least one CSV file BY NAME ONLY (does not load content)
+            // CSV files may be gigabytes - we only check existence here
             if (Directory.GetFiles(subfolder, "*.csv").Length > 0)
             {
                 mmsiList.Add(mmsi);
@@ -399,8 +405,11 @@ public static IReadOnlyList<long> GetAvailableMmsi(string rootPath)
 ### 6.2 File I/O Optimization
 
 **Date Range Filtering**:
-- Only load CSV files within time interval
-- Skip files outside date range by filename
+- Only load CSV files within time interval (by examining filenames)
+- Skip files outside date range before opening them
+- **Critical**: CSV content is never loaded during initial folder scan
+- CSV files may be gigabytes in size - loading is deferred until Process! button clicked
+- During scan, only filenames are examined to determine available date ranges
 
 ### 6.3 Algorithm Performance
 

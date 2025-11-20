@@ -38,8 +38,10 @@ The application deliberately avoids over-engineering:
 
 ### Data Flow
 ```
-Input Folder → Scan MMSI → Load Static Data + CSV Files → 
-Filter by Time → Optimize Track → Generate XML → Output Folder
+Input Folder → Scan MMSI Folders → Load Static Data (JSON only) → 
+[User Selects Ship & Time] → 
+[Process! Button Clicked] → Load & Filter CSV Files → 
+Optimize Track → Generate XML → Output Folder
 ```
 
 ## 4. System Architecture
@@ -61,16 +63,19 @@ Core data structures representing:
 
 #### 4.3 Services (Static Helpers)
 All services implemented as static methods in `Helper` class:
-- **GetAvailableMmsi**: Scans input folder for MMSI subfolders
-- **LoadShipStatic**: Reads ship metadata from JSON
-- **LoadShipStates**: Parses CSV files and filters by time interval
+- **GetAvailableMmsi**: Scans input folder for MMSI subfolders (checks for CSV file **existence only**, does not load content)
+- **LoadShipStatic**: Reads ship metadata from JSON (called when user selects a ship)
+- **LoadShipStates**: Parses CSV files and filters by time interval (**only called when Process! button is clicked**)
 - **OptimizeTrack**: Applies optimization algorithm to reduce waypoints
 - **ExportRoute**: Generates XML file in output folder
 
 #### 4.4 Parsers
-- **CSV Parser**: Reads daily AIS position files (`YYYY-MM-DD.csv`)
-- **JSON Parser**: Deserializes ship static data from `<MMSI>.json`
+- **CSV Parser**: Reads daily AIS position files (`YYYY-MM-DD.csv`) - **Only invoked when Process! button is clicked**
+- **JSON Parser**: Deserializes ship static data from `<MMSI>.json` - **Loaded immediately when ship is selected**
+- **CSV File Scanner**: Identifies available CSV files by filename during folder scan (does not load content)
 - Error handling: Malformed rows are logged and skipped, not blocking entire load
+
+**Important**: CSV files can be gigabytes in size. To avoid performance issues, CSV content is **never loaded during the initial scan**. Only filenames are read to determine available date ranges. Actual parsing occurs only after the user clicks Process! with a selected time interval.
 
 #### 4.5 Track Optimizer
 Algorithm implementation:
@@ -130,7 +135,7 @@ Generates route XML conforming to navigation system format:
 Use CsvHelper's `GetRecords<T>()` for memory-efficient streaming parse of potentially large daily files.
 
 ### Date Range Filtering
-Only load CSV files within the selected time interval (skip files outside range by filename pattern).
+Only load CSV files within the selected time interval (skip files outside range by filename pattern). CSV file content is **not loaded during folder scan** - only filenames are examined to determine available dates. Actual CSV parsing occurs only when the Process! button is clicked.
 
 ### Optimization Complexity
 Track optimizer runs in O(n) time with single pass through chronological positions.

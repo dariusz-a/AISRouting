@@ -264,29 +264,34 @@ var defaultParams = new TrackOptimizationParameters();
 **Step 1: Folder Scan**
 - User selects input folder containing MMSI subfolders
 - Application scans for numeric folder names (9-digit MMSI patterns)
-- For each MMSI folder, checks for `<MMSI>.json` and at least one `.csv` file
-- Returns list of available MMSI numbers
+- For each MMSI folder, checks for `<MMSI>.json` and at least one `.csv` file **by name only (does not load content)**
+- Examines CSV filenames to determine available date range
+- Returns list of available MMSI numbers with date ranges
 
 **Step 2: Static Data Load**
 - User selects an MMSI from the list (e.g., 205196000 - "Alice's Container Ship")
 - Application reads `205196000.json` and deserializes into `ShipStaticData`
 - Displays vessel name, dimensions, and available date range in UI
+- **CSV files are NOT loaded at this stage** (they may be gigabytes in size)
 
-**Step 3: Position Data Load**
-- User specifies `TimeInterval` (e.g., 2025-03-15 00:00 to 12:00)
-- Application identifies relevant CSV files by filename date pattern
-- Parses each CSV file, deserializes rows into `ShipState` records
+**Step 3: User Selects Time Interval**
+- User specifies `TimeInterval` using time pickers (e.g., 2025-03-15 00:00 to 12:00)
+- User clicks **Process!** button
+
+**Step 4: Position Data Load** (triggered by Process! button)
+- Application identifies relevant CSV files by filename date pattern matching the selected time interval
+- **Now** parses each relevant CSV file, deserializes rows into `ShipState` records
 - Filters positions where `TimestampUtc` falls within `TimeInterval`
 - Returns chronologically sorted list of `ShipState` records
 
-**Step 4: Track Optimization**
+**Step 5: Track Optimization**
 - Application applies optimization algorithm using `TrackOptimizationParameters`
 - Iterates through `ShipState` list, evaluating each position against last retained waypoint
 - Positions meeting any threshold criterion are converted to `RouteWaypoint` records
 - First and last positions always included
 - Returns list of `RouteWaypoint` records with sequential numbering
 
-**Step 5: XML Export**
+**Step 6: XML Export**
 - Application generates XML structure with `<RouteTemplate Name="205196000">`
 - Each `RouteWaypoint` becomes a `<WayPoint>` element with attributes
 - Timestamps formatted as `yyyyMMdd'T'HHmmss'Z'`
