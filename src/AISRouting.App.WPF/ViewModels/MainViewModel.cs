@@ -104,6 +104,10 @@ namespace AISRouting.App.WPF.ViewModels
                 {
                     InputFolderPath = ShipSelectionViewModel.InputFolderPath;
                 }
+                else if (e.PropertyName == nameof(ShipSelectionViewModel.IsT0Valid))
+                {
+                    CreateTrackCommand.NotifyCanExecuteChanged();
+                }
             };
 
             // Wire up collection synchronization
@@ -196,6 +200,22 @@ namespace AISRouting.App.WPF.ViewModels
                 );
 
                 var positionList = positions.ToList();
+                // Apply user-provided T0 (base date) to each loaded position if available
+                try
+                {
+                    var shipSelectionT0 = ShipSelectionViewModel.T0Date;
+                    if (shipSelectionT0.HasValue)
+                    {
+                        foreach (var p in positionList)
+                        {
+                            p.BaseDate = shipSelectionT0.Value.Date;
+                        }
+                    }
+                }
+                catch
+                {
+                    // ignore if for some reason T0 not available
+                }
                 StatusMessage = "Optimizing track...";
 
                 var waypoints = await _trackOptimizer.OptimizeTrackAsync(
@@ -279,6 +299,14 @@ namespace AISRouting.App.WPF.ViewModels
             if (SelectedVessel == null)
             {
                 TrackCreationError = "No ship selected";
+                CreateTrackTooltip = "Create optimized track from position data";
+                return false;
+            }
+
+            // Ensure user-provided T0 is valid
+            if (!ShipSelectionViewModel.IsT0Valid)
+            {
+                TrackCreationError = "Invalid T0 date; must be YYYY-MM-DD";
                 CreateTrackTooltip = "Create optimized track from position data";
                 return false;
             }

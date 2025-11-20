@@ -26,6 +26,18 @@ namespace AISRouting.App.WPF.ViewModels
         private TimeInterval _timeInterval;
 
         [ObservableProperty]
+        private DateTime? _t0Date;
+
+        [ObservableProperty]
+        private string _t0DateString;
+
+        [ObservableProperty]
+        private string? _t0ValidationMessage;
+
+        [ObservableProperty]
+        private bool _isT0Valid;
+
+        [ObservableProperty]
         private string _staticDataDisplay;
 
         [ObservableProperty]
@@ -68,6 +80,10 @@ namespace AISRouting.App.WPF.ViewModels
             _isInputRootValid = false;
             _startTimeString = "00:00:00";
             _stopTimeString = "00:00:00";
+            _t0Date = null;
+            _t0DateString = string.Empty;
+            _t0ValidationMessage = null;
+            _isT0Valid = true;
         }
 
         [RelayCommand]
@@ -139,6 +155,10 @@ namespace AISRouting.App.WPF.ViewModels
             StartTimeString = TimeInterval.Start.ToString("HH:mm:ss");
             StopTimeString = TimeInterval.Stop.ToString("HH:mm:ss");
 
+            // Initialize T0 to the start date by default (user-editable)
+            T0Date = TimeInterval.Start.Date;
+            T0DateString = T0Date?.ToString("yyyy-MM-dd") ?? string.Empty;
+
             ValidateTimeInterval();
 
             _logger.LogInformation("Selected vessel: {MMSI} ({Name})", value.MMSI, value.DisplayName);
@@ -185,6 +205,40 @@ namespace AISRouting.App.WPF.ViewModels
                 TimeInterval.Stop = TimeInterval.Stop.Date + time.TimeOfDay;
                 ValidateTimeInterval();
                 OnPropertyChanged(nameof(TimeInterval));
+            }
+        }
+
+        partial void OnT0DateChanged(DateTime? value)
+        {
+            if (value.HasValue)
+            {
+                T0DateString = value.Value.ToString("yyyy-MM-dd");
+                // Clear validation message when a valid DateTime is set
+                T0ValidationMessage = null;
+                IsT0Valid = true;
+                OnPropertyChanged(nameof(T0Date));
+            }
+        }
+
+        partial void OnT0DateStringChanged(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                T0ValidationMessage = "T0 must be in format YYYY-MM-DD";
+                IsT0Valid = false;
+                return;
+            }
+
+            if (DateTime.TryParseExact(value, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var parsed))
+            {
+                T0Date = parsed.Date;
+                T0ValidationMessage = null;
+                IsT0Valid = true;
+            }
+            else
+            {
+                T0ValidationMessage = "T0 must be in format YYYY-MM-DD";
+                IsT0Valid = false;
             }
         }
 

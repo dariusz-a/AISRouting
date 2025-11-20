@@ -5,6 +5,27 @@
     
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <Style x:Key="T0DatePickerStyle" TargetType="DatePicker">
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsT0Valid}" Value="False">
+                    <Setter Property="BorderBrush" Value="Red"/>
+                    <Setter Property="Background" Value="#FFFFEAEA"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="T0TextBoxStyle" TargetType="TextBox">
+            <Setter Property="BorderBrush" Value="Gray"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsT0Valid}" Value="False">
+                    <Setter Property="BorderBrush" Value="Red"/>
+                    <Setter Property="Background" Value="#FFFFEAEA"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
 
     <StackPanel Margin="10">
@@ -100,54 +121,78 @@
                     <ColumnDefinition Width="150"/>
                 </Grid.ColumnDefinitions>
 
+                <!-- T0 Date picker and display -->
+                <TextBlock Grid.Row="0" Grid.Column="0"
+                           Text="T0 (base date):"
+                           VerticalAlignment="Center"
+                           Margin="0,0,10,0"/>
+                <DatePicker Grid.Row="0" Grid.Column="1"
+                            SelectedDate="{Binding T0Date, Mode=TwoWay}"
+                            Margin="0,0,10,0"
+                            Height="28"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource T0DatePickerStyle}"
+                            AutomationProperties.AutomationId="t0-picker"
+                            AutomationProperties.Name="T0 Date"/>
+                <TextBox Grid.Row="0" Grid.Column="3"
+                         Text="{Binding T0DateString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         IsReadOnly="False"
+                         VerticalAlignment="Center"
+                         Height="28"
+                         Style="{StaticResource T0TextBoxStyle}"
+                         AutomationProperties.AutomationId="t0-textbox"
+                         AutomationProperties.Name="T0 Date Text"/>
+                <!-- T0 validation shown via control styling -->
+
                 <!-- Start Time -->
-                <TextBlock Grid.Row="0" Grid.Column="0" 
+                <TextBlock Grid.Row="1" Grid.Column="0" 
                            Text="Start Time:" 
                            VerticalAlignment="Center" 
-                           Margin="0,0,10,0"/>
-                <DatePicker Grid.Row="0" Grid.Column="1" 
+                           Margin="0,6,10,0"/>
+                <DatePicker Grid.Row="1" Grid.Column="1" 
                             SelectedDate="{Binding StartDate, Mode=TwoWay}"
-                            Margin="0,0,10,0"
+                            Margin="0,6,10,0"
+                            Height="28"
+                            VerticalAlignment="Center"
                             AutomationProperties.AutomationId="start-picker"
                             AutomationProperties.Name="Start Date"/>
-                <TextBlock Grid.Row="0" Grid.Column="2" 
+                <TextBlock Grid.Row="1" Grid.Column="2" 
                            Text="Time:" 
                            VerticalAlignment="Center" 
-                           Margin="0,0,10,0"/>
-                <TextBox Grid.Row="0" Grid.Column="3"
+                           Margin="0,6,10,0"/>
+                <TextBox Grid.Row="1" Grid.Column="3"
                          Text="{Binding StartTimeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Height="28"
+                         VerticalAlignment="Center"
+                         Margin="0,6,0,0"
                          AutomationProperties.AutomationId="start-time-picker"
                          AutomationProperties.Name="Start Time"/>
 
                 <!-- Stop Time -->
-                <TextBlock Grid.Row="1" Grid.Column="0" 
+                <TextBlock Grid.Row="2" Grid.Column="0" 
                            Text="Stop Time:" 
                            VerticalAlignment="Center" 
-                           Margin="0,10,10,0"/>
-                <DatePicker Grid.Row="1" Grid.Column="1" 
+                           Margin="0,6,10,0"/>
+                <DatePicker Grid.Row="2" Grid.Column="1" 
                             SelectedDate="{Binding StopDate, Mode=TwoWay}"
-                            Margin="0,10,10,0"
+                            Margin="0,6,10,0"
+                            Height="28"
+                            VerticalAlignment="Center"
                             AutomationProperties.AutomationId="stop-picker"
                             AutomationProperties.Name="Stop Date"/>
-                <TextBlock Grid.Row="1" Grid.Column="2" 
+                <TextBlock Grid.Row="2" Grid.Column="2" 
                            Text="Time:" 
                            VerticalAlignment="Center" 
-                           Margin="0,10,10,0"/>
-                <TextBox Grid.Row="1" Grid.Column="3"
+                           Margin="0,6,10,0"/>
+                <TextBox Grid.Row="2" Grid.Column="3"
                          Text="{Binding StopTimeString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         Margin="0,10,0,0"
+                         Margin="0,6,0,0"
+                         Height="28"
+                         VerticalAlignment="Center"
                          AutomationProperties.AutomationId="stop-time-picker"
                          AutomationProperties.Name="Stop Time"/>
 
-                <!-- Validation Message -->
-                <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4"
-                           Text="{Binding ValidationMessage}"
-                           Foreground="Red"
-                           FontWeight="Bold"
-                           Margin="0,10,0,0"
-                           Visibility="{Binding ValidationMessage, Converter={StaticResource BoolToVisibilityConverter}}"
-                           AutomationProperties.AutomationId="time-error"
-                           AutomationProperties.Name="Time Range Validation Error"/>
+                <!-- Validation Message removed; T0 invalid disables Create Track and shows red field -->
 
                 <!-- Create Track Button -->
                 <Button Grid.Row="3" Grid.Column="3"
@@ -155,7 +200,7 @@
                         HorizontalAlignment="Right"
                         Width="150"
                         Height="35"
-                        Margin="0,15,0,0"
+                    Margin="0,6,0,0"
                         Command="{Binding DataContext.CreateTrackCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                         ToolTip="{Binding DataContext.CreateTrackTooltip, RelativeSource={RelativeSource AncestorType=Window}}"
                         AutomationProperties.AutomationId="create-track-button"
