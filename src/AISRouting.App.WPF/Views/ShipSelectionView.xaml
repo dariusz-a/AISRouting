@@ -156,7 +156,8 @@
                         Width="150"
                         Height="35"
                         Margin="0,15,0,0"
-                        Command="{Binding CreateTrackCommand}"
+                        Command="{Binding DataContext.CreateTrackCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                        ToolTip="{Binding DataContext.CreateTrackTooltip, RelativeSource={RelativeSource AncestorType=Window}}"
                         AutomationProperties.AutomationId="create-track-button"
                         AutomationProperties.Name="Create Track"/>
             </Grid>

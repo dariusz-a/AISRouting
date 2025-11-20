@@ -13,6 +13,9 @@ namespace AISRouting.Tests.UnitTests.ViewModels
     {
         private ISourceDataScanner _mockScanner = null!;
         private IFolderDialogService _mockFolderDialog = null!;
+        private IShipPositionLoader _mockPositionLoader = null!;
+        private ITrackOptimizer _mockTrackOptimizer = null!;
+        private IPermissionService _mockPermissionService = null!;
         private ILogger<MainViewModel> _mockLogger = null!;
         private ShipSelectionViewModel _mockShipSelectionViewModel = null!;
         private MainViewModel _viewModel = null!;
@@ -22,10 +25,14 @@ namespace AISRouting.Tests.UnitTests.ViewModels
         {
             _mockScanner = Substitute.For<ISourceDataScanner>();
             _mockFolderDialog = Substitute.For<IFolderDialogService>();
+            _mockPositionLoader = Substitute.For<IShipPositionLoader>();
+            _mockTrackOptimizer = Substitute.For<ITrackOptimizer>();
+            _mockPermissionService = Substitute.For<IPermissionService>();
+            _mockPermissionService.CanCreateTrack().Returns(true);
             _mockLogger = Substitute.For<ILogger<MainViewModel>>();
             var mockShipLogger = Substitute.For<ILogger<ShipSelectionViewModel>>();
             _mockShipSelectionViewModel = new ShipSelectionViewModel(_mockScanner, _mockFolderDialog, mockShipLogger);
-            _viewModel = new MainViewModel(_mockScanner, _mockFolderDialog, _mockShipSelectionViewModel, _mockLogger);
+            _viewModel = new MainViewModel(_mockScanner, _mockFolderDialog, _mockPositionLoader, _mockTrackOptimizer, _mockPermissionService, _mockShipSelectionViewModel, _mockLogger);
         }
 
         [Test]

@@ -215,20 +215,6 @@ namespace AISRouting.App.WPF.ViewModels
             {
                 ValidationMessage = null;
             }
-
-            CreateTrackCommand?.NotifyCanExecuteChanged();
-        }
-
-        [RelayCommand(CanExecute = nameof(CanCreateTrack))]
-        private void CreateTrack()
-        {
-            // Placeholder for future implementation
-            _logger.LogInformation("Create Track command executed for vessel {MMSI}", SelectedVessel?.MMSI);
-        }
-
-        private bool CanCreateTrack()
-        {
-            return SelectedVessel != null && TimeInterval.IsValid;
         }
     }
 }

@@ -53,6 +53,13 @@ public partial class App : Application
         // Infrastructure services
         services.AddSingleton<ISourceDataScanner, SourceDataScanner>();
         services.AddSingleton<IShipStaticDataLoader, ShipStaticDataParser>();
+        services.AddSingleton<AISRouting.Infrastructure.Validation.IPathValidator, AISRouting.Infrastructure.Validation.PathValidator>();
+        services.AddSingleton<AISRouting.Infrastructure.Parsers.ICsvParser<AISRouting.Core.Models.ShipDataOut>, AISRouting.Infrastructure.Parsers.ShipPositionCsvParser>();
+        services.AddSingleton<IShipPositionLoader, AISRouting.Infrastructure.IO.ShipPositionLoader>();
+
+        // Core services
+        services.AddSingleton<AISRouting.Core.Services.Interfaces.ITrackOptimizer, AISRouting.Core.Services.Implementations.TrackOptimizer>();
+        services.AddSingleton<AISRouting.Core.Services.Interfaces.IPermissionService, AISRouting.Core.Services.Implementations.AlwaysAllowPermissionService>();
 
         // UI services
         services.AddSingleton<IFolderDialogService, FolderDialogService>();

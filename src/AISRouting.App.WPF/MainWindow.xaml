@@ -5,8 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AISRouting.App.WPF"
         xmlns:views="clr-namespace:AISRouting.App.WPF.Views"
+        xmlns:converters="clr-namespace:AISRouting.App.WPF.Converters"
         mc:Ignorable="d"
         Title="AISRouting" Height="700" Width="1000" MinHeight="700" MinWidth="1000">
+    
+    <Window.Resources>
+        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+    </Window.Resources>
+    
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -19,18 +25,81 @@
                                  DataContext="{Binding ShipSelectionViewModel}"
                                  Margin="0,0,0,10" />
 
-        <!-- Track Results Panel (Placeholder) -->
+        <!-- Track Results Panel -->
         <GroupBox Grid.Row="1" Header="Track Results" Margin="0,0,0,10">
             <Grid Margin="10">
-                <TextBlock Text="Track results will be displayed here in future features." 
-                           FontStyle="Italic" Foreground="Gray" />
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Error Message -->
+                <Border Grid.Row="0" 
+                        Background="#FFFFE0E0" 
+                        BorderBrush="Red" 
+                        BorderThickness="1" 
+                        Padding="10" 
+                        Margin="0,0,0,5"
+                        Visibility="{Binding TrackCreationError, Converter={StaticResource StringToVisibilityConverter}}">
+                    <TextBlock Text="{Binding TrackCreationError}" 
+                               Foreground="Red" 
+                               FontWeight="Bold"/>
+                </Border>
+
+                <!-- Warning Message -->
+                <Border Grid.Row="1" 
+                        Background="#FFFFF0D0" 
+                        BorderBrush="Orange" 
+                        BorderThickness="1" 
+                        Padding="10" 
+                        Margin="0,0,0,5"
+                        Visibility="{Binding WarningMessage, Converter={StaticResource StringToVisibilityConverter}}">
+                    <TextBlock Text="{Binding WarningMessage}" 
+                               Foreground="DarkOrange" 
+                               FontWeight="SemiBold"/>
+                </Border>
+
+                <!-- Data Quality Message -->
+                <Border Grid.Row="2" 
+                        Background="#E0F0FF" 
+                        BorderBrush="SteelBlue" 
+                        BorderThickness="1" 
+                        Padding="10" 
+                        Margin="0,0,0,5"
+                        Visibility="{Binding DataQualityMessage, Converter={StaticResource StringToVisibilityConverter}}">
+                    <TextBlock Text="{Binding DataQualityMessage}" 
+                               Foreground="SteelBlue"/>
+                </Border>
+
+                <!-- Track Results DataGrid -->
+                <DataGrid Grid.Row="3"
+                          ItemsSource="{Binding GeneratedWaypoints}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          SelectionMode="Single"
+                          GridLinesVisibility="All"
+                          HeadersVisibility="Column"
+                          AlternatingRowBackground="#F5F5F5">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Index" Binding="{Binding Index}" Width="60"/>
+                        <DataGridTextColumn Header="Latitude" Binding="{Binding Lat, StringFormat=F6}" Width="100"/>
+                        <DataGridTextColumn Header="Longitude" Binding="{Binding Lon, StringFormat=F6}" Width="100"/>
+                        <DataGridTextColumn Header="Speed (kn)" Binding="{Binding Speed, StringFormat=F2}" Width="90"/>
+                        <DataGridTextColumn Header="Heading" Binding="{Binding Heading}" Width="80"/>
+                        <DataGridTextColumn Header="Time" Binding="{Binding Time, StringFormat='yyyy-MM-dd HH:mm:ss'}" Width="150"/>
+                    </DataGrid.Columns>
+                </DataGrid>
             </Grid>
         </GroupBox>
 
         <!-- Status Bar -->
         <StatusBar Grid.Row="2">
             <StatusBarItem>
-                <TextBlock Text="Ready" />
+                <TextBlock Text="{Binding StatusMessage, TargetNullValue='Ready'}" />
             </StatusBarItem>
         </StatusBar>
     </Grid>
