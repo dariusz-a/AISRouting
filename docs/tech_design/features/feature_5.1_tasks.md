@@ -1,0 +1,8 @@
+- [ ] Create `ShipTable` UI component
+- [ ] Implement `useMmsiScanResults()` data provider
+- [ ] Wire `handleSelectMmsi` to global state/store
+- [ ] Implement ShipStaticData panel integration
+- [ ] Add unit tests for render and selection behaviors
+- [ ] Add E2E test covering folder scan -> select -> enable flow
+- [ ] Accessibility review and keyboard navigation
+- [ ] Performance: add virtualization if needed
