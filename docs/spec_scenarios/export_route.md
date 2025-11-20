@@ -12,7 +12,7 @@ This feature describes exporting a generated track into an XML file using the `r
 
 ### Examples:
 	| mmsi | start | end | user_id | output_path |
-	| 205196000 | 20250315T000000 | 20250316T000000 | scenario-user | C:\\tmp\\exports |
+	| mmsi-1 | ts_first | ts_last | scenario-user | export_tmp |
 
 ### Scenario: Prompt on filename conflict and overwrite chosen
 	Given a generated track exists for ship "205196000" and an export file named "205196000-20250315T000000-20250316T000000.xml" already exists in "C:\\tmp\\exports" and the user "scenario-user" is logged in.

@@ -12,7 +12,7 @@ This feature explains initial setup: placing `route_waypoint_template.xml`, sele
 
 ### Examples:
 	| install_path |
-	| C:\\apps\\AISRouting |
+	| input_root_example |
 
 ### Scenario: Select input data root with vessel subfolders
 	Given the file system path "C:\\data\\ais_root" contains vessel subfolders each with CSV files and the application is running and shows the Input Folder selector.

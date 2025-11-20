@@ -13,7 +13,7 @@ This feature covers generating an optimized track from AIS CSV records for a sel
 
 ### Examples:
 	| input_root | mmsi | user_id | first_ts | last_ts | start | end |
-	| C:\\data\\ais_root | 205196000 | scenario-user | 20250315T000000 | 20250316T000000 | 20250315T000000 | 20250316T000000 |
+	| input_root_example | mmsi-1 | scenario-user | ts_first | ts_last | ts_first | ts_last |
 
 ### Scenario: Create track with noisy data and narrowed time window
 	Given the input root "C:\\data\\ais_root" contains noisy AIS CSV rows for vessel "205196000" and the simulator user "scenario-user" is logged in.

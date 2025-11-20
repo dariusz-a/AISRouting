@@ -6,24 +6,24 @@ This feature lists common problems and resolutions when preparing, creating, and
 ## Positive Scenarios
 
 ### Scenario: Detect missing CSV files and instruct user
-	Given the input root "C:\\data\\ais_root" is selected and the application is running and the ship selection UI is visible.
+	Given the input root "input_root_example" is selected and the application is running and the ship selection UI is visible.
 	When no CSV files are detected in any vessel subfolders within "C:\\data\\ais_root".
 	Then the UI displays an inline instruction with text "No CSV files detected in selected input root" and guidance to verify the input folder structure.
 
 ## Negative & Edge Scenarios
 
 ### Scenario: Export fails due to permission or path issues
-	Given a generated track exists for ship "205196000" and the user selects output folder "C:\\protected\\exports" which cannot be created or written to.
+	Given a generated track exists for ship "mmsi-1" and the user selects output folder "export_protected" which cannot be created or written to.
 	When the user clicks the Export button and confirms the selected output folder.
 	Then a visible error banner with text "Cannot write to output path: C:\\protected\\exports" is shown and export is aborted with no file created.
 
 ### Scenario: Missing Heading or SOG values handled
-	Given the selected time range contains CSV rows missing Heading and/or SOG values and the user initiates track creation or export.
+	Given the selected time range contains CSV rows missing Heading and/or SOG values and the user "scenario-user" initiates track creation or export.
 	When the processing runs over those rows.
 	Then waypoints generated for records with missing Heading or SOG default those fields to 0 and a warning banner with text "Missing Heading/SOG values defaulted to 0" is displayed.
 
 ### Scenario: Recommend narrowing time range for noisy data
-	Given noisy AIS data is present in vessel folder "205196000" and the simulator user is preparing to create a track.
+	Given noisy AIS data is present in vessel folder "mmsi-1" and the simulator user is preparing to create a track.
 	When the user narrows the time window and runs Create Track.
 	Then the resulting track contains fewer spurious points and the UI shows a note "Narrowing the time window reduced noise in the generated track".
 
