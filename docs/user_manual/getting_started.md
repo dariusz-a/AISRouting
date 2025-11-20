@@ -6,7 +6,8 @@ This section explains how to install, launch and access the AIS Routing applicat
 ## Prerequisites
 - Windows PC used by the K-Sim instructor
 - Application installer or unpacked application files available locally
-- AIS input files placed in the expected folder structure: outputFolder/<MMSI>/<MMSI>-yyyy-MM-dd.csv
+- "Vessel AIS data" input files placed in the expected folder structure: outputFolder/<MMSI>/<MMSI>-yyyy-MM-dd.csv
+- "Vessel static data" input files placed in the expected folder structure: outputFolder/<MMSI>/<MMSI>.json
 - Familiarity with opening local applications on Windows
 
 ## Step-by-Step Instructions

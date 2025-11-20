@@ -10,8 +10,9 @@ This section explains how to pick a vessel from the available AIS data and how t
 ## Step-by-Step Instructions
 ### Selecting a ship
 1. In the main window, open the Ship List panel.
-2. Find the vessel by MMSI in the list. The list includes metadata for each MMSI (length, width, ship type, etc.).
-3. Click the desired MMSI to select the vessel.
+2. Filter the ship list using min-max lenght, min-max width, ship type.
+3. Find the vessel by MMSI in the list. The list includes metadata for each MMSI (length, width, ship type, etc.).
+4. Click the desired MMSI to select the vessel.
 4. **Expected result**: The selected vessel is highlighted and the available dates/time ranges for that MMSI are displayed.
 
 ### Selecting time range
