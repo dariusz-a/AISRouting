@@ -123,8 +123,6 @@ d:\repo\AISRouting
      - Distance: 5 meters
      - SOG threshold: 0.2 knots
      - ROT threshold: 0.2 deg/s
-4. Generated track displayed as list of waypoints in UI
-5. User reviews points for continuity and expected vessel behavior
 
 ### Route Export
 1. User clicks **Export** button from generated track view
@@ -216,6 +214,7 @@ Track optimization reduces redundant position reports by identifying significant
 - **Haversine formula**: geodesic distance calculation between lat/lon points
 - **Bearing calculation**: initial bearing between two geographic points (for heading validation)
 - **Time interpolation**: convert Time (seconds from T0) to absolute timestamps
+- **Software Engineer**: provide solution for **Optimization Algorithm**
 
 ## Data Formats
 
