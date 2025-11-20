@@ -1,0 +1,202 @@
+using AISRouting.Core.Models;
+using AISRouting.Core.Services.Interfaces;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.ObjectModel;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace AISRouting.App.WPF.ViewModels
+{
+    public partial class ShipSelectionViewModel : ObservableObject
+    {
+        private readonly ISourceDataScanner _scanner;
+        private readonly IFolderDialogService _folderDialog;
+        private readonly ILogger<ShipSelectionViewModel> _logger;
+
+        [ObservableProperty]
+        private ObservableCollection<ShipStaticData> _availableVessels;
+
+        [ObservableProperty]
+        private ShipStaticData? _selectedVessel;
+
+        [ObservableProperty]
+        private TimeInterval _timeInterval;
+
+        [ObservableProperty]
+        private string _staticDataDisplay;
+
+        [ObservableProperty]
+        private string? _validationMessage;
+
+        [ObservableProperty]
+        private string? _errorMessage;
+
+        [ObservableProperty]
+        private bool _isInputRootValid;
+
+        [ObservableProperty]
+        private string _inputFolderPath;
+
+        [ObservableProperty]
+        private string _startTimeString;
+
+        [ObservableProperty]
+        private string _stopTimeString;
+
+        public ShipSelectionViewModel(
+            ISourceDataScanner scanner,
+            IFolderDialogService folderDialog,
+            ILogger<ShipSelectionViewModel> logger)
+        {
+            _scanner = scanner ?? throw new ArgumentNullException(nameof(scanner));
+            _folderDialog = folderDialog ?? throw new ArgumentNullException(nameof(folderDialog));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _availableVessels = new ObservableCollection<ShipStaticData>();
+            _timeInterval = new TimeInterval();
+            _staticDataDisplay = string.Empty;
+            _inputFolderPath = string.Empty;
+            _isInputRootValid = false;
+            _startTimeString = "00:00:00";
+            _stopTimeString = "00:00:00";
+        }
+
+        [RelayCommand]
+        private async Task SelectInputFolder()
+        {
+            var folderPath = _folderDialog.ShowFolderBrowser();
+            if (string.IsNullOrEmpty(folderPath))
+                return;
+
+            try
+            {
+                _logger.LogInformation("Selected input folder: {FolderPath}", folderPath);
+
+                var vessels = await _scanner.ScanInputFolderAsync(folderPath);
+
+                AvailableVessels.Clear();
+                foreach (var vessel in vessels)
+                {
+                    AvailableVessels.Add(vessel);
+                }
+
+                InputFolderPath = folderPath;
+                IsInputRootValid = true;
+                ErrorMessage = null;
+
+                _logger.LogInformation("Loaded {Count} vessels", AvailableVessels.Count);
+            }
+            catch (System.IO.DirectoryNotFoundException ex)
+            {
+                _logger.LogError(ex, "Input root not accessible");
+                IsInputRootValid = false;
+                ErrorMessage = $"Input root not accessible: {folderPath}";
+                AvailableVessels.Clear();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogError(ex, "Access denied to input folder");
+                IsInputRootValid = false;
+                ErrorMessage = $"Access denied: {folderPath}";
+                AvailableVessels.Clear();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error scanning input folder");
+                IsInputRootValid = false;
+                ErrorMessage = $"Error scanning folder: {ex.Message}";
+                AvailableVessels.Clear();
+            }
+        }
+
+        partial void OnSelectedVesselChanged(ShipStaticData? value)
+        {
+            if (value == null)
+            {
+                StaticDataDisplay = string.Empty;
+                return;
+            }
+
+            StaticDataDisplay = FormatStaticData(value);
+
+            TimeInterval.Start = value.MinDate;
+            TimeInterval.Stop = value.MaxDate.AddDays(1);
+
+            // Update time strings
+            StartTimeString = TimeInterval.Start.ToString("HH:mm:ss");
+            StopTimeString = TimeInterval.Stop.ToString("HH:mm:ss");
+
+            ValidateTimeInterval();
+
+            _logger.LogInformation("Selected vessel: {MMSI} ({Name})", value.MMSI, value.DisplayName);
+        }
+
+        partial void OnStartTimeStringChanged(string value)
+        {
+            if (DateTime.TryParseExact(value, "HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out var time))
+            {
+                TimeInterval.Start = TimeInterval.Start.Date + time.TimeOfDay;
+                ValidateTimeInterval();
+            }
+        }
+
+        partial void OnStopTimeStringChanged(string value)
+        {
+            if (DateTime.TryParseExact(value, "HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out var time))
+            {
+                TimeInterval.Stop = TimeInterval.Stop.Date + time.TimeOfDay;
+                ValidateTimeInterval();
+            }
+        }
+
+        private string FormatStaticData(ShipStaticData data)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"MMSI: {data.MMSI}");
+            sb.AppendLine($"Name: {data.Name ?? "N/A"}");
+            sb.AppendLine($"Length: {(data.Length.HasValue ? $"{data.Length.Value:F1} m" : "N/A")}");
+            sb.AppendLine($"Beam: {(data.Beam.HasValue ? $"{data.Beam.Value:F1} m" : "N/A")}");
+            sb.AppendLine($"Draught: {(data.Draught.HasValue ? $"{data.Draught.Value:F1} m" : "N/A")}");
+
+            if (data.MinDate != DateTime.MinValue && data.MaxDate != DateTime.MinValue)
+            {
+                sb.AppendLine($"Available Date Range: {data.MinDate:yyyy-MM-dd} to {data.MaxDate:yyyy-MM-dd}");
+            }
+            else
+            {
+                sb.AppendLine("Available Date Range: N/A");
+            }
+
+            return sb.ToString();
+        }
+
+        private void ValidateTimeInterval()
+        {
+            if (!TimeInterval.IsValid)
+            {
+                ValidationMessage = "Invalid time range";
+            }
+            else
+            {
+                ValidationMessage = null;
+            }
+
+            CreateTrackCommand?.NotifyCanExecuteChanged();
+        }
+
+        [RelayCommand(CanExecute = nameof(CanCreateTrack))]
+        private void CreateTrack()
+        {
+            // Placeholder for future implementation
+            _logger.LogInformation("Create Track command executed for vessel {MMSI}", SelectedVessel?.MMSI);
+        }
+
+        private bool CanCreateTrack()
+        {
+            return SelectedVessel != null && TimeInterval.IsValid;
+        }
+    }
+}

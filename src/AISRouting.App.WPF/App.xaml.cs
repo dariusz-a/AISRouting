@@ -59,6 +59,7 @@ public partial class App : Application
 
         // ViewModels
         services.AddTransient<MainViewModel>();
+        services.AddTransient<ShipSelectionViewModel>();
 
         // Views
         services.AddTransient<MainWindow>();

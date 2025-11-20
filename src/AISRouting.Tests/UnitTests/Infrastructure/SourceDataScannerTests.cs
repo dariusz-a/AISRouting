@@ -90,7 +90,7 @@ namespace AISRouting.Tests.UnitTests.Infrastructure
             result.Should().HaveCount(1);
             var vessel = result.First();
             vessel.MMSI.Should().Be(123456789);
-            vessel.DisplayName.Should().Be("Vessel 123456789");
+            vessel.DisplayName.Should().Be("123456789");
         }
 
         [Test]

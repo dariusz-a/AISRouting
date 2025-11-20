@@ -20,7 +20,7 @@ namespace AISRouting.Core.Models
         /// <summary>
         /// Gets a user-friendly display name for the vessel.
         /// </summary>
-        public string DisplayName => Name ?? $"Vessel {MMSI}";
+        public string DisplayName => Name ?? MMSI.ToString();
 
         public ShipStaticData()
         {

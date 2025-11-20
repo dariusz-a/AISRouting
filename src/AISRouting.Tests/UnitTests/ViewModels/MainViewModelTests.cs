@@ -14,6 +14,7 @@ namespace AISRouting.Tests.UnitTests.ViewModels
         private ISourceDataScanner _mockScanner = null!;
         private IFolderDialogService _mockFolderDialog = null!;
         private ILogger<MainViewModel> _mockLogger = null!;
+        private ShipSelectionViewModel _mockShipSelectionViewModel = null!;
         private MainViewModel _viewModel = null!;
 
         [SetUp]
@@ -22,7 +23,9 @@ namespace AISRouting.Tests.UnitTests.ViewModels
             _mockScanner = Substitute.For<ISourceDataScanner>();
             _mockFolderDialog = Substitute.For<IFolderDialogService>();
             _mockLogger = Substitute.For<ILogger<MainViewModel>>();
-            _viewModel = new MainViewModel(_mockScanner, _mockFolderDialog, _mockLogger);
+            var mockShipLogger = Substitute.For<ILogger<ShipSelectionViewModel>>();
+            _mockShipSelectionViewModel = new ShipSelectionViewModel(_mockScanner, _mockFolderDialog, mockShipLogger);
+            _viewModel = new MainViewModel(_mockScanner, _mockFolderDialog, _mockShipSelectionViewModel, _mockLogger);
         }
 
         [Test]

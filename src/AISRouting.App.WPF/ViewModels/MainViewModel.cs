@@ -31,14 +31,18 @@ namespace AISRouting.App.WPF.ViewModels
 
         public ObservableCollection<ShipStaticData> AvailableVessels { get; } = new();
 
+        public ShipSelectionViewModel ShipSelectionViewModel { get; }
+
         public MainViewModel(
             ISourceDataScanner scanner,
             IFolderDialogService folderDialog,
+            ShipSelectionViewModel shipSelectionViewModel,
             ILogger<MainViewModel> logger)
         {
             _scanner = scanner ?? throw new ArgumentNullException(nameof(scanner));
             _folderDialog = folderDialog ?? throw new ArgumentNullException(nameof(folderDialog));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            ShipSelectionViewModel = shipSelectionViewModel ?? throw new ArgumentNullException(nameof(shipSelectionViewModel));
         }
 
         [RelayCommand]
