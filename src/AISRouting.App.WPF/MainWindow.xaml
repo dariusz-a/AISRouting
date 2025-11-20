@@ -11,6 +11,7 @@
     
     <Window.Resources>
         <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </Window.Resources>
     
     <Grid Margin="10">
@@ -115,7 +116,17 @@
                 </Border>
 
                 <!-- Track Results DataGrid -->
-                <DataGrid Grid.Row="4"
+                <StackPanel Grid.Row="4" Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,5">
+                        <Button Content="Show Comparison"
+                                Command="{Binding ShowComparisonCommand}"
+                                Width="140"
+                                Visibility="{Binding ShowComparisonButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                                AutomationProperties.AutomationId="show-comparison-button"
+                                AutomationProperties.Name="Show Track Comparison"/>
+                    </StackPanel>
+
+                    <DataGrid
                           ItemsSource="{Binding GeneratedWaypoints}"
                           AutoGenerateColumns="False"
                           IsReadOnly="True"
@@ -125,15 +136,16 @@
                           GridLinesVisibility="All"
                           HeadersVisibility="Column"
                           AlternatingRowBackground="#F5F5F5">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Index" Binding="{Binding Index}" Width="60"/>
-                        <DataGridTextColumn Header="Latitude" Binding="{Binding Lat, StringFormat=F6}" Width="100"/>
-                        <DataGridTextColumn Header="Longitude" Binding="{Binding Lon, StringFormat=F6}" Width="100"/>
-                        <DataGridTextColumn Header="Speed (kn)" Binding="{Binding Speed, StringFormat=F2}" Width="90"/>
-                        <DataGridTextColumn Header="Heading" Binding="{Binding Heading}" Width="80"/>
-                        <DataGridTextColumn Header="Time" Binding="{Binding Time, StringFormat='yyyy-MM-dd HH:mm:ss'}" Width="150"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Index" Binding="{Binding Index}" Width="60"/>
+                            <DataGridTextColumn Header="Latitude" Binding="{Binding Lat, StringFormat=F6}" Width="100"/>
+                            <DataGridTextColumn Header="Longitude" Binding="{Binding Lon, StringFormat=F6}" Width="100"/>
+                            <DataGridTextColumn Header="Speed (kn)" Binding="{Binding Speed, StringFormat=F2}" Width="90"/>
+                            <DataGridTextColumn Header="Heading" Binding="{Binding Heading}" Width="80"/>
+                            <DataGridTextColumn Header="Time" Binding="{Binding Time, StringFormat='yyyy-MM-dd HH:mm:ss'}" Width="150"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
             </Grid>
         </GroupBox>
 

@@ -5,6 +5,8 @@ using AISRouting.Core.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
+using AISRouting.App.WPF.Views;
+using AISRouting.App.WPF.ViewModels;
 
 namespace AISRouting.App.WPF.ViewModels
 {
@@ -39,6 +41,12 @@ namespace AISRouting.App.WPF.ViewModels
 
         [ObservableProperty]
         private ObservableCollection<RouteWaypoint> _generatedWaypoints;
+
+        [ObservableProperty]
+        private bool _showComparisonButtonVisible;
+
+        // hold initial loaded positions so we can plot them as well
+        private List<AISRouting.Core.Models.ShipDataOut>? _initialPositions;
 
         [ObservableProperty]
         private string _statusMessage;
@@ -200,6 +208,7 @@ namespace AISRouting.App.WPF.ViewModels
                 );
 
                 var positionList = positions.ToList();
+                _initialPositions = positionList;
                 // Apply user-provided T0 (base date) to each loaded position if available
                 try
                 {
@@ -249,6 +258,11 @@ namespace AISRouting.App.WPF.ViewModels
                 }
 
                 GeneratedWaypoints = new ObservableCollection<RouteWaypoint>(waypointList);
+
+                // make comparison button visible when results are populated
+                ShowComparisonButtonVisible = GeneratedWaypoints.Any();
+                // ensure command CanExecute re-evaluates now that data is available
+                ShowComparisonCommand.NotifyCanExecuteChanged();
 
                 var positionCount = positionList.Count;
                 var reductionPercent = positionCount > 0
@@ -408,6 +422,34 @@ namespace AISRouting.App.WPF.ViewModels
             }
         }
 
+        [RelayCommand(CanExecute = nameof(CanShowComparison))]
+        private void ShowComparison()
+        {
+            if (_initialPositions == null || GeneratedWaypoints == null || !GeneratedWaypoints.Any())
+                return;
+
+            // prepare arrays
+            var initialLons = _initialPositions.Select(p => (double)p.Lon!.Value).ToArray();
+            var initialLats = _initialPositions.Select(p => (double)p.Lat!.Value).ToArray();
+            var optimizedLons = GeneratedWaypoints.Select(w => w.Lon).ToArray();
+            var optimizedLats = GeneratedWaypoints.Select(w => w.Lat).ToArray();
+
+            var vm = new TrackPlotViewModel();
+            var window = new TrackPlotWindow();
+            window.InitializeWithViewModel(vm);
+            
+            // Set data AFTER attaching the plot control
+            vm.SetData(initialLons, initialLats, optimizedLons, optimizedLats, $"Track Comparison - {SelectedVessel?.MMSI}");
+            
+            window.Owner = System.Windows.Application.Current.MainWindow;
+            window.Show();
+        }
+
+        private bool CanShowComparison()
+        {
+            return GeneratedWaypoints != null && GeneratedWaypoints.Count > 0 && _initialPositions != null && _initialPositions.Count > 0;
+        }
+
         private bool CanExportRoute()
         {
             return GeneratedWaypoints?.Count > 0 && !string.IsNullOrWhiteSpace(OutputFolderPath);
@@ -424,6 +466,7 @@ namespace AISRouting.App.WPF.ViewModels
         partial void OnGeneratedWaypointsChanged(ObservableCollection<RouteWaypoint> value)
         {
             ExportRouteCommand.NotifyCanExecuteChanged();
+            ShowComparisonCommand.NotifyCanExecuteChanged();
         }
 
         partial void OnOutputFolderPathChanged(string? value)
