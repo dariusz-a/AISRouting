@@ -6,7 +6,7 @@ Your job is to produce a single **Implementation Plan** document.
 ## Input Sources
 
 ### A set of technical-design documents that explain the architecture and ownership of each feature area. 
-- Location: `docs/tech_design/core_features/*.md`
+
 
 ### A set of Feature Specifications
 - Location: `docs/spec_scenarios/*.md`
