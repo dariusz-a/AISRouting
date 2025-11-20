@@ -1,0 +1,18 @@
+{
+  "mmsi": "205196000",
+  "name": "NP 460",
+  "callSign": "ORKB",
+  "vesselType": "Other",
+  "imo": null,
+  "width": 34,
+  "length": 83,
+  "draught": 5,
+  "typeOfMobile": "Class A",
+  "cargoType": null,
+  "positionFixingDevice": "GPS",
+  "dataSourceType": "AIS",
+  "a": "8",
+  "b": "75",
+  "c": "16",
+  "d": "18"
+}

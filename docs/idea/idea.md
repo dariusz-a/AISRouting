@@ -45,8 +45,8 @@ This data is processed using pre-processing tool and written as "source data".
 
 In that specific folder, there are subfolders generated for multiple vessels named after theirs MMSI-s.
 In such a folder there is one JSON file with vessel related static data, and multiple processed CSV files with AIS data. 
-JSON file contains "ship static data" and defined in file <MMSI>.json an example is in file `787987987.json` . 
-CSV file <dateOnly>.csv contains "ship AIS data", an example is in file `2024-01-28.csv` . 
+JSON file contains "ship static data" and defined in file <MMSI>.json an example is in file `205196000.json` . 
+CSV file <dateOnly>.csv contains "ship AIS data", an example is in file `2025-03-15.csv` . 
 <dateOnly> is formatted as YYYY-MM-DD. 
 
 ### Format OF CSV File
