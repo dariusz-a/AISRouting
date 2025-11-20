@@ -59,23 +59,58 @@ Include the important design decisions that tests should be aware of, inline to 
 ---
 
 ## 3) Data Models (Inline)
-Include minimal TypeScript interfaces mirroring the C# models for test-data generation and fixtures.
+Include TypeScript interfaces that match the C# data_models exactly for reliable fixture generation and mapping in tests.
 
 ```ts
-// Minimal test-friendly interfaces
-interface ShipStaticData {
-  MMSI: number;
-  Name?: string;
-  MinDate?: string; // ISO date
-  MaxDate?: string; // ISO date
-  FolderPath: string;
+// Mirrors docs/tech_design/data_models.md C# models
+export interface ShipStaticData {
+  MMSI: number;                 // 9-digit Maritime Mobile Service Identity
+  Name?: string | null;         // Vessel name (nullable, fallback to folder name)
+  Length?: number | null;       // Length in meters
+  Beam?: number | null;         // Beam (width) in meters
+  Draught?: number | null;      // Draught in meters
+  TypeCode?: number | null;     // AIS vessel type code
+  CallSign?: string | null;     // Radio call sign
+  IMO?: number | null;          // IMO number
+  MinDate: string;              // Earliest timestamp from CSV files (ISO)
+  MaxDate: string;              // Latest timestamp from CSV files (ISO)
+  FolderPath: string;           // Full path to vessel folder
 }
 
-interface TestCsvRecord {
-  Time: number;
-  Latitude?: number;
-  Longitude?: number;
-  SOG?: number;
+export interface ShipDataOut {
+  Time: number;                 // Seconds since T0 (date at 00:00:00 UTC)
+  Latitude?: number | null;     // Decimal degrees
+  Longitude?: number | null;    // Decimal degrees
+  NavigationalStatusIndex?: number | null; // 0-15 per AIS specification
+  ROT?: number | null;          // Rate of turn (degrees/minute)
+  SOG?: number | null;          // Speed over ground (knots)
+  COG?: number | null;          // Course over ground (degrees)
+  Heading?: number | null;      // True heading (degrees, 0-359)
+  Draught?: number | null;      // Current draught (meters)
+  DestinationIndex?: number | null; // Lookup index for destination
+  EtaSecondsUntil?: number | null;   // Seconds until ETA from current time
+}
+
+export interface RouteWaypoint {
+  Name: string;                 // MMSI as string
+  Lat: number;                  // Latitude (decimal degrees)
+  Lon: number;                  // Longitude (decimal degrees)
+  Alt: number;                  // Altitude (always 0 for maritime)
+  Speed: number;                // SOG from CSV (knots)
+  ETA: number;                  // EtaSecondsUntil or 0
+  Delay: number;                // Always 0
+  Mode: string;                 // Computed via SetWaypointMode
+  TrackMode: string;            // Always "Track"
+  Heading: number;              // True heading or 0
+  PortXTE: number;              // Always 20
+  StbdXTE: number;              // Always 20
+  MinSpeed: number;             // Always 0
+  MaxSpeed: number;             // Maximum SOG observed in route
+}
+
+export interface TimeInterval {
+  Start: string; // ISO date-time
+  Stop: string;  // ISO date-time
 }
 ```
 
