@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AISRouting Test App</title>
+  </head>
+  <body>
+    <nav aria-label="Main" data-testid="main-nav">
+      <a href="#" data-testid="nav-home">Home</a>
+      <a href="#" data-testid="nav-products">Products</a>
+    </nav>
+
+    <header>
+      <img src="/logo.svg" alt="Acme portal logo" data-testid="header-logo" />
+      <button type="button" aria-label="Refresh data" data-testid="refresh-btn">Refresh</button>
+    </header>
+
+    <section role="region" aria-labelledby="loginTitle" data-testid="login-section">
+      <h2 id="loginTitle">Sign in</h2>
+      <form aria-labelledby="loginTitle" data-testid="login-form">
+        <input id="username" name="username" type="text" data-testid="username-input" />
+        <input id="password" name="password" type="password" data-testid="password-input" />
+        <button type="submit" data-testid="submit-login-btn">Sign in</button>
+      </form>
+    </section>
+
+    <main>
+      <ul data-testid="product-list">
+        <li data-testid="product-card-42">
+          <button type="button" aria-label="Add Widget to cart" data-testid="add-to-cart-42">Add</button>
+        </li>
+      </ul>
+    </main>
+  </body>
+</html>
