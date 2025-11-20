@@ -1,0 +1,114 @@
+﻿<Window x:Class="AISRouting.App.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AISRouting.App.WPF"
+        mc:Ignorable="d"
+        Title="AISRouting" Height="700" Width="1000" MinHeight="700" MinWidth="1000">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Input Configuration Panel -->
+        <GroupBox Grid.Row="0" Header="Input Configuration" Margin="0,0,0,10">
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="Input Folder:" 
+                           VerticalAlignment="Center" Margin="0,0,10,0" />
+                <TextBox Grid.Column="1" 
+                         Text="{Binding InputFolderPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         IsReadOnly="True"
+                         VerticalContentAlignment="Center"
+                         Margin="0,0,10,0" />
+                <Button Grid.Column="2" 
+                        Content="Browse..."
+                        Command="{Binding SelectInputFolderCommand}"
+                        AutomationProperties.AutomationId="select-input-folder"
+                        Padding="15,5"
+                        MinWidth="100" />
+            </Grid>
+        </GroupBox>
+
+        <!-- Vessel Selection Panel -->
+        <GroupBox Grid.Row="1" Header="Vessel Selection" Margin="0,0,0,10">
+            <Grid Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Vessel ComboBox -->
+                <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="Select Vessel:" 
+                               VerticalAlignment="Center" Margin="0,0,10,0" />
+                    <ComboBox Grid.Column="1" 
+                              AutomationProperties.AutomationId="ship-combo"
+                              ItemsSource="{Binding AvailableVessels}"
+                              SelectedItem="{Binding SelectedVessel}"
+                              DisplayMemberPath="DisplayName"
+                              IsEnabled="{Binding AvailableVessels.Count, Converter={StaticResource CountToBooleanConverter}}" />
+                </Grid>
+
+                <!-- Warning Message -->
+                <TextBlock Grid.Row="1"
+                           AutomationProperties.AutomationId="no-vessels-warning"
+                           Text="{Binding FolderErrorMessage}"
+                           Visibility="{Binding FolderErrorMessage, Converter={StaticResource StringToVisibilityConverter}}"
+                           Foreground="Orange"
+                           FontWeight="SemiBold"
+                           Margin="0,5,0,10" />
+
+                <!-- Scanning Progress -->
+                <StackPanel Grid.Row="2" 
+                            Orientation="Horizontal"
+                            Visibility="{Binding IsScanning, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <TextBlock Text="Scanning for vessels..." Margin="0,0,10,0" VerticalAlignment="Center" />
+                    <ProgressBar IsIndeterminate="True" Width="150" Height="20" />
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+        <!-- Time Interval Panel (Placeholder) -->
+        <GroupBox Grid.Row="2" Header="Time Interval" Margin="0,0,0,10">
+            <Grid Margin="10">
+                <TextBlock Text="Time interval selection will be implemented in future features." 
+                           FontStyle="Italic" Foreground="Gray" />
+            </Grid>
+        </GroupBox>
+
+        <!-- Track Results Panel (Placeholder) -->
+        <GroupBox Grid.Row="3" Header="Track Results" Margin="0,0,0,10">
+            <Grid Margin="10">
+                <TextBlock Text="Track results will be displayed here in future features." 
+                           FontStyle="Italic" Foreground="Gray" />
+            </Grid>
+        </GroupBox>
+
+        <!-- Status Bar -->
+        <StatusBar Grid.Row="4">
+            <StatusBarItem>
+                <TextBlock Text="Ready" />
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

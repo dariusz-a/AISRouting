@@ -1,0 +1,11 @@
+﻿<Application x:Class="AISRouting.App.WPF.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:AISRouting.App.WPF"
+             xmlns:converters="clr-namespace:AISRouting.App.WPF.Converters">
+    <Application.Resources>
+        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+        <converters:CountToBooleanConverter x:Key="CountToBooleanConverter"/>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </Application.Resources>
+</Application>
