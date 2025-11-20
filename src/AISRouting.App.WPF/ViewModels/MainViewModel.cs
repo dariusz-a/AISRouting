@@ -18,6 +18,7 @@ namespace AISRouting.App.WPF.ViewModels
         private readonly IShipPositionLoader _positionLoader;
         private readonly ITrackOptimizer _trackOptimizer;
         private readonly IPermissionService _permissionService;
+        private readonly IRouteExporter _routeExporter;
         private readonly ILogger<MainViewModel> _logger;
         private CancellationTokenSource? _cancellationTokenSource;
 
@@ -54,6 +55,9 @@ namespace AISRouting.App.WPF.ViewModels
         [ObservableProperty]
         private string _createTrackTooltip;
 
+        [ObservableProperty]
+        private string? _outputFolderPath;
+
         public ObservableCollection<ShipStaticData> AvailableVessels { get; } = new();
 
         public ShipSelectionViewModel ShipSelectionViewModel { get; }
@@ -64,6 +68,7 @@ namespace AISRouting.App.WPF.ViewModels
             IShipPositionLoader positionLoader,
             ITrackOptimizer trackOptimizer,
             IPermissionService permissionService,
+            IRouteExporter routeExporter,
             ShipSelectionViewModel shipSelectionViewModel,
             ILogger<MainViewModel> logger)
         {
@@ -72,6 +77,7 @@ namespace AISRouting.App.WPF.ViewModels
             _positionLoader = positionLoader ?? throw new ArgumentNullException(nameof(positionLoader));
             _trackOptimizer = trackOptimizer ?? throw new ArgumentNullException(nameof(trackOptimizer));
             _permissionService = permissionService ?? throw new ArgumentNullException(nameof(permissionService));
+            _routeExporter = routeExporter ?? throw new ArgumentNullException(nameof(routeExporter));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             ShipSelectionViewModel = shipSelectionViewModel ?? throw new ArgumentNullException(nameof(shipSelectionViewModel));
 
@@ -312,6 +318,81 @@ namespace AISRouting.App.WPF.ViewModels
         {
             TrackCreationError = string.Empty;
             CreateTrackCommand.NotifyCanExecuteChanged();
+        }
+
+        [RelayCommand]
+        private void SelectOutputFolder()
+        {
+            var path = _folderDialog.ShowFolderBrowser(OutputFolderPath);
+            if (!string.IsNullOrEmpty(path))
+            {
+                OutputFolderPath = path;
+                ExportRouteCommand.NotifyCanExecuteChanged();
+            }
+        }
+
+        [RelayCommand(CanExecute = nameof(CanExportRoute))]
+        private async Task ExportRouteAsync()
+        {
+            try
+            {
+                StatusMessage = "Exporting route...";
+
+                var filename = GenerateFilename();
+                var outputFilePath = Path.Combine(OutputFolderPath!, filename);
+
+                await _routeExporter.ExportRouteAsync(
+                    GeneratedWaypoints,
+                    outputFilePath,
+                    cancellationToken: _cancellationTokenSource?.Token ?? CancellationToken.None);
+
+                var actualFilename = Path.GetFileName(outputFilePath);
+                StatusMessage = $"Export successful: {actualFilename}";
+                _logger.LogInformation("Successfully exported route to {Path}", outputFilePath);
+            }
+            catch (OperationCanceledException)
+            {
+                StatusMessage = "Export cancelled";
+                _logger.LogInformation("Export cancelled by user");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                StatusMessage = $"Cannot write to output path: {OutputFolderPath}";
+                _logger.LogError(ex, "Access denied to output path: {Path}", OutputFolderPath);
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                StatusMessage = $"Output folder not found: {OutputFolderPath}";
+                _logger.LogError(ex, "Output directory not found: {Path}", OutputFolderPath);
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Export failed: {ex.Message}";
+                _logger.LogError(ex, "Failed to export route");
+            }
+        }
+
+        private bool CanExportRoute()
+        {
+            return GeneratedWaypoints?.Count > 0 && !string.IsNullOrWhiteSpace(OutputFolderPath);
+        }
+
+        private string GenerateFilename()
+        {
+            var mmsi = GeneratedWaypoints.First().Name;
+            var start = GeneratedWaypoints.First().Time;
+            var end = GeneratedWaypoints.Last().Time;
+            return $"{mmsi}-{start:yyyyMMddTHHmmss}-{end:yyyyMMddTHHmmss}.xml";
+        }
+
+        partial void OnGeneratedWaypointsChanged(ObservableCollection<RouteWaypoint> value)
+        {
+            ExportRouteCommand.NotifyCanExecuteChanged();
+        }
+
+        partial void OnOutputFolderPathChanged(string? value)
+        {
+            ExportRouteCommand.NotifyCanExecuteChanged();
         }
     }
 }

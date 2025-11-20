@@ -16,6 +16,7 @@ namespace AISRouting.Tests.UnitTests.ViewModels
         private IShipPositionLoader _mockPositionLoader = null!;
         private ITrackOptimizer _mockTrackOptimizer = null!;
         private IPermissionService _mockPermissionService = null!;
+        private IRouteExporter _mockRouteExporter = null!;
         private ILogger<MainViewModel> _mockLogger = null!;
         private ShipSelectionViewModel _mockShipSelectionViewModel = null!;
         private MainViewModel _viewModel = null!;
@@ -29,10 +30,11 @@ namespace AISRouting.Tests.UnitTests.ViewModels
             _mockTrackOptimizer = Substitute.For<ITrackOptimizer>();
             _mockPermissionService = Substitute.For<IPermissionService>();
             _mockPermissionService.CanCreateTrack().Returns(true);
+            _mockRouteExporter = Substitute.For<IRouteExporter>();
             _mockLogger = Substitute.For<ILogger<MainViewModel>>();
             var mockShipLogger = Substitute.For<ILogger<ShipSelectionViewModel>>();
             _mockShipSelectionViewModel = new ShipSelectionViewModel(_mockScanner, _mockFolderDialog, mockShipLogger);
-            _viewModel = new MainViewModel(_mockScanner, _mockFolderDialog, _mockPositionLoader, _mockTrackOptimizer, _mockPermissionService, _mockShipSelectionViewModel, _mockLogger);
+            _viewModel = new MainViewModel(_mockScanner, _mockFolderDialog, _mockPositionLoader, _mockTrackOptimizer, _mockPermissionService, _mockRouteExporter, _mockShipSelectionViewModel, _mockLogger);
         }
 
         [Test]
@@ -284,6 +286,161 @@ namespace AISRouting.Tests.UnitTests.ViewModels
             // Assert
             canExecute.Should().BeFalse();
             _viewModel.CreateTrackTooltip.Should().Be("Insufficient privileges");
+        }
+
+        [Test]
+        public void ExportRouteCommand_WithNoWaypoints_CannotExecute()
+        {
+            // Arrange
+            _viewModel.OutputFolderPath = @"C:\Output";
+
+            // Act
+            var canExecute = _viewModel.ExportRouteCommand.CanExecute(null);
+
+            // Assert
+            canExecute.Should().BeFalse();
+        }
+
+        [Test]
+        public void ExportRouteCommand_WithNoOutputFolder_CannotExecute()
+        {
+            // Arrange
+            _viewModel.GeneratedWaypoints.Add(new RouteWaypoint { Name = "205196000" });
+
+            // Act
+            var canExecute = _viewModel.ExportRouteCommand.CanExecute(null);
+
+            // Assert
+            canExecute.Should().BeFalse();
+        }
+
+        [Test]
+        public void ExportRouteCommand_WithWaypointsAndOutputFolder_CanExecute()
+        {
+            // Arrange
+            _viewModel.GeneratedWaypoints.Add(new RouteWaypoint 
+            { 
+                Name = "205196000", 
+                Lat = 55.0, 
+                Lon = 12.0, 
+                Time = DateTime.Now 
+            });
+            _viewModel.OutputFolderPath = @"C:\Output";
+
+            // Act
+            var canExecute = _viewModel.ExportRouteCommand.CanExecute(null);
+
+            // Assert
+            canExecute.Should().BeTrue();
+        }
+
+        [Test]
+        public async Task ExportRouteCommand_WithValidData_CallsExporter()
+        {
+            // Arrange
+            _viewModel.GeneratedWaypoints.Add(new RouteWaypoint 
+            { 
+                Name = "205196000", 
+                Lat = 55.0, 
+                Lon = 12.0, 
+                Time = new DateTime(2025, 3, 15, 0, 0, 0)
+            });
+            _viewModel.OutputFolderPath = @"C:\Output";
+
+            // Act
+            await _viewModel.ExportRouteCommand.ExecuteAsync(null);
+
+            // Assert
+            await _mockRouteExporter.Received(1).ExportRouteAsync(
+                Arg.Any<IEnumerable<RouteWaypoint>>(),
+                Arg.Is<string>(path => path.Contains("205196000-20250315T000000")),
+                Arg.Any<ExportOptions?>(),
+                Arg.Any<CancellationToken>());
+            _viewModel.StatusMessage.Should().Contain("Export successful");
+        }
+
+        [Test]
+        public async Task ExportRouteCommand_WithUserCancellation_SetsStatusMessageToCancelled()
+        {
+            // Arrange
+            _viewModel.GeneratedWaypoints.Add(new RouteWaypoint 
+            { 
+                Name = "205196000", 
+                Lat = 55.0, 
+                Lon = 12.0, 
+                Time = DateTime.Now 
+            });
+            _viewModel.OutputFolderPath = @"C:\Output";
+
+            _mockRouteExporter
+                .When(x => x.ExportRouteAsync(
+                    Arg.Any<IEnumerable<RouteWaypoint>>(),
+                    Arg.Any<string>(),
+                    Arg.Any<ExportOptions?>(),
+                    Arg.Any<CancellationToken>()))
+                .Do(x => throw new OperationCanceledException("Export cancelled by user"));
+
+            // Act
+            await _viewModel.ExportRouteCommand.ExecuteAsync(null);
+
+            // Assert
+            _viewModel.StatusMessage.Should().Be("Export cancelled");
+        }
+
+        [Test]
+        public async Task ExportRouteCommand_WithUnauthorizedAccess_DisplaysErrorMessage()
+        {
+            // Arrange
+            _viewModel.GeneratedWaypoints.Add(new RouteWaypoint 
+            { 
+                Name = "205196000", 
+                Lat = 55.0, 
+                Lon = 12.0, 
+                Time = DateTime.Now 
+            });
+            _viewModel.OutputFolderPath = @"C:\Protected";
+
+            _mockRouteExporter
+                .When(x => x.ExportRouteAsync(
+                    Arg.Any<IEnumerable<RouteWaypoint>>(),
+                    Arg.Any<string>(),
+                    Arg.Any<ExportOptions?>(),
+                    Arg.Any<CancellationToken>()))
+                .Do(x => throw new UnauthorizedAccessException("Access denied"));
+
+            // Act
+            await _viewModel.ExportRouteCommand.ExecuteAsync(null);
+
+            // Assert
+            _viewModel.StatusMessage.Should().Contain("Cannot write to output path");
+        }
+
+        [Test]
+        public void SelectOutputFolderCommand_WithValidSelection_SetsOutputFolderPath()
+        {
+            // Arrange
+            var selectedPath = @"C:\Output";
+            _mockFolderDialog.ShowFolderBrowser(Arg.Any<string?>()).Returns(selectedPath);
+
+            // Act
+            _viewModel.SelectOutputFolderCommand.Execute(null);
+
+            // Assert
+            _viewModel.OutputFolderPath.Should().Be(selectedPath);
+        }
+
+        [Test]
+        public void SelectOutputFolderCommand_WithCancelledDialog_DoesNotChangeOutputPath()
+        {
+            // Arrange
+            _viewModel.OutputFolderPath = @"C:\Existing";
+            _mockFolderDialog.ShowFolderBrowser(Arg.Any<string?>()).Returns((string?)null);
+
+            // Act
+            _viewModel.SelectOutputFolderCommand.Execute(null);
+
+            // Assert
+            _viewModel.OutputFolderPath.Should().Be(@"C:\Existing");
         }
     }
 }

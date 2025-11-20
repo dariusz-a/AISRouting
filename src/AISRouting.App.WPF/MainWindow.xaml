@@ -32,11 +32,52 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
+                <!-- Output Folder Selection -->
+                <GroupBox Grid.Row="0" Header="Export Settings" Margin="0,0,0,10">
+                    <Grid Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" 
+                                   Text="Output Folder:" 
+                                   VerticalAlignment="Center" 
+                                   Margin="0,0,10,0"/>
+                        
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding OutputFolderPath, Mode=OneWay}"
+                                 IsReadOnly="True"
+                                 VerticalAlignment="Center"
+                                 Margin="0,0,10,0"
+                                 AutomationProperties.AutomationId="output-folder-textbox"
+                                 AutomationProperties.Name="Output Folder Path"/>
+                        
+                        <Button Grid.Column="2"
+                                Content="Browse..."
+                                Command="{Binding SelectOutputFolderCommand}"
+                                Width="100"
+                                Margin="0,0,10,0"
+                                AutomationProperties.AutomationId="browse-output-button"
+                                AutomationProperties.Name="Browse for Output Folder"/>
+                        
+                        <Button Grid.Column="3"
+                                Content="Export to XML"
+                                Command="{Binding ExportRouteCommand}"
+                                Width="120"
+                                AutomationProperties.AutomationId="export-button"
+                                AutomationProperties.Name="Export Route to XML"/>
+                    </Grid>
+                </GroupBox>
+
                 <!-- Error Message -->
-                <Border Grid.Row="0" 
+                <Border Grid.Row="1" 
                         Background="#FFFFE0E0" 
                         BorderBrush="Red" 
                         BorderThickness="1" 
@@ -49,7 +90,7 @@
                 </Border>
 
                 <!-- Warning Message -->
-                <Border Grid.Row="1" 
+                <Border Grid.Row="2" 
                         Background="#FFFFF0D0" 
                         BorderBrush="Orange" 
                         BorderThickness="1" 
@@ -62,7 +103,7 @@
                 </Border>
 
                 <!-- Data Quality Message -->
-                <Border Grid.Row="2" 
+                <Border Grid.Row="3" 
                         Background="#E0F0FF" 
                         BorderBrush="SteelBlue" 
                         BorderThickness="1" 
@@ -74,7 +115,7 @@
                 </Border>
 
                 <!-- Track Results DataGrid -->
-                <DataGrid Grid.Row="3"
+                <DataGrid Grid.Row="4"
                           ItemsSource="{Binding GeneratedWaypoints}"
                           AutoGenerateColumns="False"
                           IsReadOnly="True"

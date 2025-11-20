@@ -12,12 +12,12 @@ namespace AISRouting.Infrastructure.IO
     public class ShipPositionLoader : IShipPositionLoader
     {
         private readonly ILogger<ShipPositionLoader> _logger;
-        private readonly IPathValidator _pathValidator;
+        private readonly Validation.IPathValidator _pathValidator;
         private readonly ICsvParser<ShipDataOut> _csvParser;
 
         public ShipPositionLoader(
             ILogger<ShipPositionLoader> logger,
-            IPathValidator pathValidator,
+            Validation.IPathValidator pathValidator,
             ICsvParser<ShipDataOut> csvParser)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

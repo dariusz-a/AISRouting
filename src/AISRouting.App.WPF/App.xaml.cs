@@ -56,6 +56,8 @@ public partial class App : Application
         services.AddSingleton<AISRouting.Infrastructure.Validation.IPathValidator, AISRouting.Infrastructure.Validation.PathValidator>();
         services.AddSingleton<AISRouting.Infrastructure.Parsers.ICsvParser<AISRouting.Core.Models.ShipDataOut>, AISRouting.Infrastructure.Parsers.ShipPositionCsvParser>();
         services.AddSingleton<IShipPositionLoader, AISRouting.Infrastructure.IO.ShipPositionLoader>();
+        services.AddSingleton<AISRouting.Core.Services.Interfaces.IPathValidator, AISRouting.Infrastructure.Validation.PathValidator>();
+        services.AddSingleton<AISRouting.Core.Services.Interfaces.IRouteExporter, AISRouting.Infrastructure.Persistence.RouteExporter>();
 
         // Core services
         services.AddSingleton<AISRouting.Core.Services.Interfaces.ITrackOptimizer, AISRouting.Core.Services.Implementations.TrackOptimizer>();
@@ -63,6 +65,7 @@ public partial class App : Application
 
         // UI services
         services.AddSingleton<IFolderDialogService, FolderDialogService>();
+        services.AddSingleton<IFileConflictDialogService, FileConflictDialogService>();
 
         // ViewModels
         services.AddTransient<MainViewModel>();
