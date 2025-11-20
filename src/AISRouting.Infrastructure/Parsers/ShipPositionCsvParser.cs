@@ -35,7 +35,7 @@ namespace AISRouting.Infrastructure.Parsers
                 using var reader = new StreamReader(filePath);
                 var config = new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
-                    HasHeaderRecord = true,
+                    HasHeaderRecord = false,
                     MissingFieldFound = null,
                     BadDataFound = context =>
                     {
@@ -44,6 +44,7 @@ namespace AISRouting.Infrastructure.Parsers
                 };
 
                 using var csv = new CsvReader(reader, config);
+                csv.Context.RegisterClassMap<ShipDataOutCsvMapByIndex>();
 
                 await foreach (var record in csv.GetRecordsAsync<ShipDataOutCsvMap>(cancellationToken))
                 {
@@ -94,6 +95,28 @@ namespace AISRouting.Infrastructure.Parsers
             public double? Draught { get; set; }
             public int? DestinationIndex { get; set; }
             public long? EtaSecondsUntil { get; set; }
+        }
+
+        /// <summary>
+        /// Class map for CSV files without headers, using column indexes.
+        /// CSV format: Time,Lat,Lon,NavigationalStatusIndex,ROT,SOG,COG,Heading,Draught,DestinationIndex,EtaSecondsUntil
+        /// </summary>
+        private sealed class ShipDataOutCsvMapByIndex : ClassMap<ShipDataOutCsvMap>
+        {
+            public ShipDataOutCsvMapByIndex()
+            {
+                Map(m => m.Time).Index(0);
+                Map(m => m.Lat).Index(1).Optional();
+                Map(m => m.Lon).Index(2).Optional();
+                Map(m => m.NavigationalStatusIndex).Index(3).Optional();
+                Map(m => m.ROT).Index(4).Optional();
+                Map(m => m.SOG).Index(5).Optional();
+                Map(m => m.COG).Index(6).Optional();
+                Map(m => m.Heading).Index(7).Optional();
+                Map(m => m.Draught).Index(8).Optional();
+                Map(m => m.DestinationIndex).Index(9).Optional();
+                Map(m => m.EtaSecondsUntil).Index(10).Optional();
+            }
         }
     }
 }
