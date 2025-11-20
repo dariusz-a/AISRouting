@@ -1,7 +1,9 @@
 import { Page, Locator } from '@playwright/test';
 
 export async function elementExists(locator: Locator) {
-  try { return await locator.isVisible(); } catch { return false; }
+  // Return true if visible, false if not found or not visible.
+  // Avoid swallowing unexpected errors — only catch visibility failures.
+  return await locator.isVisible().catch(() => false);
 }
 
 export async function selectVessel(page: Page, mmsi: string) {

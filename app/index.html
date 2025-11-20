@@ -54,8 +54,13 @@
         </div>
 
         <div role="alert" aria-live="assertive" data-testid="time-error" style="display:none;color:red;">Invalid time range</div>
-
-        <button type="button" data-testid="create-track">Create Track</button>
+          <button type="button" data-testid="create-track">Create Track</button>
+      
+          <!-- Track results list (tests expect this element) -->
+          <section role="region" aria-labelledby="trackResultsTitle" class="track-results" style="display:none;">
+            <h3 id="trackResultsTitle">Track Results</h3>
+            <ul data-testid="track-results-list" aria-live="polite"></ul>
+          </section>
       </section>
     </main>
   </body>
