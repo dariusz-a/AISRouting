@@ -17,6 +17,7 @@
     <PackageReference Include="NUnit" Version="3.14.0" />
     <PackageReference Include="NUnit.Analyzers" Version="3.9.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="ScottPlot" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +28,10 @@
     <ProjectReference Include="..\AISRouting.Core\AISRouting.Core.csproj" />
     <ProjectReference Include="..\AISRouting.Infrastructure\AISRouting.Infrastructure.csproj" />
     <ProjectReference Include="..\AISRouting.App.WPF\AISRouting.App.WPF.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="TestData\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,18 @@
+{
+  "mmsi": "210253000",
+  "name": "ALVANITH",
+  "callSign": "5BUR5",
+  "vesselType": "Tanker",
+  "imo": "9856799",
+  "width": 17,
+  "length": 118,
+  "draught": 6.6,
+  "typeOfMobile": "Class A",
+  "cargoType": "Category Y",
+  "positionFixingDevice": "GPS",
+  "dataSourceType": "AIS",
+  "a": "100",
+  "b": "18",
+  "c": "8",
+  "d": "9"
+}
