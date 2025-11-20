@@ -4,7 +4,6 @@
 This section explains how to install and start AISRouting, access the UI, and perform initial setup required before creating and exporting routes.
 
 ## Prerequisites
-- A machine with Python 3.x for CLI utilities (optional). 
 - Access to AIS CSV input folders containing vessel subfolders and CSV files (folder structure documented below).
 - route_waypoint_template.xml available in the application directory for export metadata.
 
