@@ -98,15 +98,17 @@ namespace AISRouting.App.WPF.ViewModels
                 {
                     InputFolderPath = ShipSelectionViewModel.InputFolderPath;
                 }
-                else if (e.PropertyName == nameof(ShipSelectionViewModel.AvailableVessels))
+            };
+
+            // Wire up collection synchronization
+            ShipSelectionViewModel.AvailableVessels.CollectionChanged += (s, e) =>
+            {
+                AvailableVessels.Clear();
+                foreach (var vessel in ShipSelectionViewModel.AvailableVessels)
                 {
-                    AvailableVessels.Clear();
-                    foreach (var vessel in ShipSelectionViewModel.AvailableVessels)
-                    {
-                        AvailableVessels.Add(vessel);
-                    }
-                    CreateTrackCommand.NotifyCanExecuteChanged();
+                    AvailableVessels.Add(vessel);
                 }
+                CreateTrackCommand.NotifyCanExecuteChanged();
             };
         }
 
