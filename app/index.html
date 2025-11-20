@@ -31,6 +31,32 @@
           <button type="button" aria-label="Add Widget to cart" data-testid="add-to-cart-42">Add</button>
         </li>
       </ul>
+      <section role="region" aria-labelledby="shipSelectionTitle" data-testid="ship-selection">
+        <h2 id="shipSelectionTitle">Ship Selection</h2>
+        <label for="ship-combo" class="visually-hidden">Ship selection</label>
+        <select id="ship-combo" data-testid="ship-combo" aria-label="Ship selection">
+          <option value="">-- choose ship --</option>
+          <option value="205196000">205196000</option>
+          <option value="205196001">205196001</option>
+        </select>
+
+        <div role="region" aria-labelledby="shipStaticTitle" data-testid="ship-static">
+          <h3 id="shipStaticTitle">Ship static data</h3>
+          <pre data-testid="ship-static-content">Select a ship to view static data.</pre>
+        </div>
+
+        <div class="pickers">
+          <label for="start-picker">Start</label>
+          <input id="start-picker" type="datetime-local" data-testid="start-picker" />
+
+          <label for="stop-picker">Stop</label>
+          <input id="stop-picker" type="datetime-local" data-testid="stop-picker" />
+        </div>
+
+        <div role="alert" aria-live="assertive" data-testid="time-error" style="display:none;color:red;">Invalid time range</div>
+
+        <button type="button" data-testid="create-track">Create Track</button>
+      </section>
     </main>
   </body>
 </html>
