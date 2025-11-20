@@ -308,6 +308,7 @@ namespace AISRouting.App.WPF.ViewModels
 
         partial void OnTimeIntervalChanged(TimeInterval value)
         {
+            TrackCreationError = string.Empty;
             CreateTrackCommand.NotifyCanExecuteChanged();
         }
     }

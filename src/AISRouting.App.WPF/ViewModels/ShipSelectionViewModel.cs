@@ -130,7 +130,7 @@ namespace AISRouting.App.WPF.ViewModels
 
             // Update both TimeInterval and the separate date properties
             TimeInterval.Start = value.MinDate;
-            TimeInterval.Stop = value.MaxDate.AddDays(1);
+            TimeInterval.Stop = value.MaxDate.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
 
             StartDate = TimeInterval.Start;
             StopDate = TimeInterval.Stop;
@@ -152,6 +152,7 @@ namespace AISRouting.App.WPF.ViewModels
                 var time = TimeInterval.Start.TimeOfDay;
                 TimeInterval.Start = value.Value.Date + time;
                 ValidateTimeInterval();
+                OnPropertyChanged(nameof(TimeInterval));
             }
         }
 
@@ -163,6 +164,7 @@ namespace AISRouting.App.WPF.ViewModels
                 var time = TimeInterval.Stop.TimeOfDay;
                 TimeInterval.Stop = value.Value.Date + time;
                 ValidateTimeInterval();
+                OnPropertyChanged(nameof(TimeInterval));
             }
         }
 
@@ -172,6 +174,7 @@ namespace AISRouting.App.WPF.ViewModels
             {
                 TimeInterval.Start = TimeInterval.Start.Date + time.TimeOfDay;
                 ValidateTimeInterval();
+                OnPropertyChanged(nameof(TimeInterval));
             }
         }
 
@@ -181,6 +184,7 @@ namespace AISRouting.App.WPF.ViewModels
             {
                 TimeInterval.Stop = TimeInterval.Stop.Date + time.TimeOfDay;
                 ValidateTimeInterval();
+                OnPropertyChanged(nameof(TimeInterval));
             }
         }
 

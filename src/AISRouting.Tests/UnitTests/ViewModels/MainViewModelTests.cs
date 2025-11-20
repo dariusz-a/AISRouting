@@ -132,5 +132,158 @@ namespace AISRouting.Tests.UnitTests.ViewModels
             isScanningDuringExecution.Should().BeTrue("IsScanning should be true during execution");
             _viewModel.IsScanning.Should().BeFalse("IsScanning should be false after completion");
         }
+
+        [Test]
+        public void CreateTrackCommand_WhenNoVesselSelected_IsDisabled()
+        {
+            // Arrange
+            _mockShipSelectionViewModel.SelectedVessel = null;
+            _viewModel.InputFolderPath = @"C:\TestFolder";
+            _viewModel.TimeInterval = new TimeInterval { Start = DateTime.Now, Stop = DateTime.Now.AddHours(1) };
+
+            // Act
+            var canExecute = _viewModel.CreateTrackCommand.CanExecute(null);
+
+            // Assert
+            canExecute.Should().BeFalse();
+            _viewModel.TrackCreationError.Should().Be("No ship selected");
+        }
+
+        [Test]
+        public void CreateTrackCommand_WhenInvalidTimeInterval_IsDisabled()
+        {
+            // Arrange
+            var vessel = new ShipStaticData(205196000, @"C:\TestFolder") 
+            { 
+                Name = "Test Ship",
+                MinDate = DateTime.Now.Date,
+                MaxDate = DateTime.Now.Date
+            };
+            _mockShipSelectionViewModel.SelectedVessel = vessel;
+            _mockShipSelectionViewModel.InputFolderPath = @"C:\TestFolder";
+            _mockShipSelectionViewModel.AvailableVessels.Add(vessel);
+            
+            // Trigger property changed to sync to MainViewModel
+            _viewModel.SelectedVessel = vessel;
+            _viewModel.InputFolderPath = @"C:\TestFolder";
+            _viewModel.TimeInterval = new TimeInterval { Start = DateTime.Now, Stop = DateTime.Now.AddHours(-1) }; // Invalid: Stop before Start
+
+            // Act
+            var canExecute = _viewModel.CreateTrackCommand.CanExecute(null);
+
+            // Assert
+            canExecute.Should().BeFalse();
+            _viewModel.TrackCreationError.Should().Be("Invalid time interval");
+        }
+
+        [Test]
+        public void CreateTrackCommand_WhenAllConditionsMet_IsEnabled()
+        {
+            // Arrange
+            var vessel = new ShipStaticData(205196000, @"C:\TestFolder") 
+            { 
+                Name = "Test Ship",
+                MinDate = DateTime.Now.Date,
+                MaxDate = DateTime.Now.Date
+            };
+            
+            _mockShipSelectionViewModel.SelectedVessel = vessel;
+            _mockShipSelectionViewModel.InputFolderPath = @"C:\TestFolder";
+            _mockShipSelectionViewModel.AvailableVessels.Add(vessel);
+            
+            // Sync to MainViewModel
+            _viewModel.SelectedVessel = vessel;
+            _viewModel.InputFolderPath = @"C:\TestFolder";
+            _viewModel.AvailableVessels.Add(vessel);
+            _viewModel.TimeInterval = new TimeInterval { Start = DateTime.Now, Stop = DateTime.Now.AddHours(1) };
+
+            // Act
+            var canExecute = _viewModel.CreateTrackCommand.CanExecute(null);
+
+            // Assert
+            canExecute.Should().BeTrue();
+            _viewModel.TrackCreationError.Should().BeEmpty();
+        }
+
+        [Test]
+        public void OnTimeIntervalChanged_ClearsTrackCreationError()
+        {
+            // Arrange
+            _viewModel.TrackCreationError = "Some error";
+
+            // Act
+            _viewModel.TimeInterval = new TimeInterval { Start = DateTime.Now, Stop = DateTime.Now.AddHours(1) };
+
+            // Assert
+            _viewModel.TrackCreationError.Should().BeEmpty();
+        }
+
+        [Test]
+        public void OnSelectedVesselChanged_ClearsTrackCreationError()
+        {
+            // Arrange
+            _viewModel.TrackCreationError = "Some error";
+            var vessel = new ShipStaticData(205196000, @"C:\TestFolder") { Name = "Test Ship" };
+
+            // Act
+            _viewModel.SelectedVessel = vessel;
+
+            // Assert
+            _viewModel.TrackCreationError.Should().BeEmpty();
+        }
+
+        [Test]
+        public void CreateTrackCommand_WhenNoInputFolder_IsDisabled()
+        {
+            // Arrange
+            var vessel = new ShipStaticData(205196000, @"C:\TestFolder") { Name = "Test Ship" };
+            _viewModel.SelectedVessel = vessel;
+            _viewModel.InputFolderPath = null;
+            _viewModel.TimeInterval = new TimeInterval { Start = DateTime.Now, Stop = DateTime.Now.AddHours(1) };
+
+            // Act
+            var canExecute = _viewModel.CreateTrackCommand.CanExecute(null);
+
+            // Assert
+            canExecute.Should().BeFalse();
+            _viewModel.TrackCreationError.Should().Be("No input folder selected");
+        }
+
+        [Test]
+        public void CreateTrackCommand_WhenNoVesselsAvailable_IsDisabled()
+        {
+            // Arrange
+            var vessel = new ShipStaticData(205196000, @"C:\TestFolder") { Name = "Test Ship" };
+            _viewModel.SelectedVessel = vessel;
+            _viewModel.InputFolderPath = @"C:\TestFolder";
+            _viewModel.TimeInterval = new TimeInterval { Start = DateTime.Now, Stop = DateTime.Now.AddHours(1) };
+            _viewModel.AvailableVessels.Clear(); // No vessels
+
+            // Act
+            var canExecute = _viewModel.CreateTrackCommand.CanExecute(null);
+
+            // Assert
+            canExecute.Should().BeFalse();
+            _viewModel.TrackCreationError.Should().Be("No vessels found in input root");
+        }
+
+        [Test]
+        public void CreateTrackCommand_WhenPermissionDenied_IsDisabled()
+        {
+            // Arrange
+            _mockPermissionService.CanCreateTrack().Returns(false);
+            var vessel = new ShipStaticData(205196000, @"C:\TestFolder") { Name = "Test Ship" };
+            _viewModel.SelectedVessel = vessel;
+            _viewModel.InputFolderPath = @"C:\TestFolder";
+            _viewModel.AvailableVessels.Add(vessel);
+            _viewModel.TimeInterval = new TimeInterval { Start = DateTime.Now, Stop = DateTime.Now.AddHours(1) };
+
+            // Act
+            var canExecute = _viewModel.CreateTrackCommand.CanExecute(null);
+
+            // Assert
+            canExecute.Should().BeFalse();
+            _viewModel.CreateTrackTooltip.Should().Be("Insufficient privileges");
+        }
     }
 }
