@@ -74,8 +74,18 @@ namespace AISRouting.Infrastructure.Persistence
                 }
             }
 
+            // Determine route template name (extract MMSI prefix from filename if present)
+            var filename = Path.GetFileNameWithoutExtension(outputFilePath);
+            var templateName = "Unknown";
+            if (!string.IsNullOrEmpty(filename))
+            {
+                var parts = filename.Split('-');
+                if (parts.Length > 0 && !string.IsNullOrEmpty(parts[0]))
+                    templateName = parts[0];
+            }
+
             // Generate XML
-            var xml = GenerateRouteXml(waypointList);
+            var xml = GenerateRouteXml(waypointList, templateName);
 
             // Write to file
             await File.WriteAllTextAsync(outputFilePath, xml.ToString(), cancellationToken);
@@ -85,21 +95,24 @@ namespace AISRouting.Infrastructure.Persistence
                 waypointList.Count, outputFilePath);
         }
 
-        private XDocument GenerateRouteXml(List<RouteWaypoint> waypoints)
+        private XDocument GenerateRouteXml(List<RouteWaypoint> waypoints, string templateName)
         {
-            var mmsi = waypoints.FirstOrDefault()?.Name ?? "Unknown";
             var maxSpeed = waypoints.Where(w => w.Speed > 0).Max(w => w.Speed);
 
             var routeTemplate = new XElement("RouteTemplate",
-                new XAttribute("Name", mmsi),
+                new XAttribute("Name", templateName),
                 new XAttribute("ColorR", "1"),
                 new XAttribute("ColorG", "124"),
                 new XAttribute("ColorB", "139"));
 
+            int wpIndex = 1;
             foreach (var wp in waypoints)
             {
+                // Use sequential waypoint names WP001..WP999 regardless of RouteWaypoint.Name
+                var waypointName = $"WP{wpIndex:000}";
+
                 var waypointElement = new XElement("WayPoint",
-                    new XAttribute("Name", wp.Name),
+                    new XAttribute("Name", waypointName),
                     new XAttribute("Lat", wp.Lat.ToString("F6", CultureInfo.InvariantCulture)),
                     new XAttribute("Lon", wp.Lon.ToString("F6", CultureInfo.InvariantCulture)),
                     new XAttribute("Alt", wp.Alt),
@@ -116,6 +129,7 @@ namespace AISRouting.Infrastructure.Persistence
                 );
 
                 routeTemplate.Add(waypointElement);
+                wpIndex++;
             }
 
             var rootElement = new XElement("RouteTemplates", routeTemplate);

@@ -45,7 +45,7 @@ namespace AISRouting.Tests.UnitTests.Infrastructure
         {
             // Arrange
             var waypoints = CreateTestWaypoints();
-            var outputPath = Path.Combine(_testFolder, "test_route.xml");
+            var outputPath = Path.Combine(_testFolder, "205196000-test_route.xml");
 
             // Act
             await _exporter.ExportRouteAsync(waypoints, outputPath);
@@ -187,7 +187,7 @@ namespace AISRouting.Tests.UnitTests.Infrastructure
                     Time = new DateTime(2025, 3, 15, 0, 0, 0)
                 }
             };
-            var outputPath = Path.Combine(_testFolder, "attribute_test.xml");
+            var outputPath = Path.Combine(_testFolder, "205196000-attribute_test.xml");
 
             // Act
             await _exporter.ExportRouteAsync(waypoints, outputPath);
@@ -196,7 +196,8 @@ namespace AISRouting.Tests.UnitTests.Infrastructure
             var xml = XDocument.Load(outputPath);
             var waypointElement = xml.Root!.Element("RouteTemplate")!.Element("WayPoint")!;
             
-            waypointElement.Attribute("Name")!.Value.Should().Be("205196000");
+            // WayPoint element names are sequential WP001..WP999
+            waypointElement.Attribute("Name")!.Value.Should().Be("WP001");
             waypointElement.Attribute("Lat")!.Value.Should().Be("55.123456");
             waypointElement.Attribute("Lon")!.Value.Should().Be("12.345678");
             waypointElement.Attribute("Alt")!.Value.Should().Be("0");
