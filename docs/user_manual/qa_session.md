@@ -38,7 +38,7 @@
 
 ## Q10: What filename pattern and XML metadata should exported route files use (e.g., filename format, RouteTemplate Name, color attributes, required WayPoint attributes, any additional metadata)?
 
-**A10:** filename pattern - MMSINumber-StartDate-EndDate.xml and metadata from route_waypoint_template.xml
+**A10:** filename pattern - MMSINumber-StartDate-EndDate.xml with embedded template metadata (color, cross-track error tolerances, etc.)
 
 ## Q11: Should the exported XML include only generated WayPoint elements inside a single RouteTemplate, or support multiple RouteTemplate entries per file? Also specify whether RouteTemplate Name should use MMSI or a user-supplied name.
 

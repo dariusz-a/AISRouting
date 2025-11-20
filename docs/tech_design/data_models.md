@@ -232,19 +232,30 @@ MMSINumber-StartDate-EndDate.xml
 205196000-20250315T000000-20250316T000000.xml
 ```
 
-**XML Structure (based on route_waypoint_template.xml):**
+**XML Structure:**
+The application generates XML output following this structure:
+
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<RouteTemplate Name="205196000">
-  <WayPoint Name="205196000" Lat="55.123456" Lon="12.345678" Alt="0" 
-            Speed="12.3" ETA="3600" Delay="0" Mode="Auto" TrackMode="Track" 
-            Heading="45" PortXTE="20" StbdXTE="20" MinSpeed="0" MaxSpeed="15.8" />
-  <WayPoint Name="205196000" Lat="55.145678" Lon="12.367890" Alt="0" 
-            Speed="12.5" ETA="3000" Delay="0" Mode="Auto" TrackMode="Track" 
-            Heading="46" PortXTE="20" StbdXTE="20" MinSpeed="0" MaxSpeed="15.8" />
-  <!-- ... more waypoints ... -->
-</RouteTemplate>
+<RouteTemplates>
+  <RouteTemplate Name="{MMSI}" ColorR="1" ColorG="124" ColorB="139">
+    <WayPoint Name="{MMSI}" Lat="{Latitude}" Lon="{Longitude}" Alt="0" 
+              Speed="{SOG}" ETA="{EtaSecondsUntil|0}" Delay="0" Mode="Cruise" 
+              TrackMode="Track" Heading="{Heading|0}" PortXTE="20" StbdXTE="20" 
+              MinSpeed="0" MaxSpeed="{MaxSOG}" />
+    <!-- ... more waypoints ... -->
+  </RouteTemplate>
+</RouteTemplates>
 ```
+
+**Default Template Attributes:**
+- ColorR="1", ColorG="124", ColorB="139" (teal color)
+- PortXTE="20", StbdXTE="20" (cross-track error tolerance)
+- Alt="0" (altitude, always 0 for maritime)
+- Delay="0" (no waypoint delay)
+- MinSpeed="0" (no minimum speed constraint)
+- Mode="Cruise" (default waypoint mode)
+- TrackMode="Track" (track following mode)
 
 ## Data Relationships
 
@@ -378,10 +389,11 @@ var settings = new XmlWriterSettings
 };
 ```
 
-**Template Metadata:**
-- Read color/style attributes from `route_waypoint_template.xml`
-- Apply to `<RouteTemplate>` element
-- Preserve template structure
+**Template Structure:**
+- Use embedded default template structure
+- Apply standard color attributes (ColorR=1, ColorG=124, ColorB=139)
+- Generate `<RouteTemplate>` element with MMSI as Name
+- Wrap in `<RouteTemplates>` root element
 
 **File Conflict Resolution:**
 - Check if file exists

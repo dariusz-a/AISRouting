@@ -55,7 +55,6 @@ namespace AISRouting.Core.Services
     {
         Task ExportRouteAsync(
             IEnumerable<RouteWaypoint> waypoints,
-            string templatePath,
             string outputFilePath,
             ExportOptions options = null,
             CancellationToken cancellationToken = default);
@@ -441,7 +440,7 @@ public class TrackOptimizer : ITrackOptimizer
 
 ### IRouteExporter Implementation
 
-**Purpose**: Export waypoints to XML using template
+**Purpose**: Export waypoints to XML with embedded template structure
 
 **Implementation:**
 ```csharp
@@ -453,7 +452,6 @@ public class RouteExporter : IRouteExporter
 
     public async Task ExportRouteAsync(
         IEnumerable<RouteWaypoint> waypoints,
-        string templatePath,
         string outputFilePath,
         ExportOptions options = null,
         CancellationToken cancellationToken = default)
@@ -461,7 +459,6 @@ public class RouteExporter : IRouteExporter
         options ??= ExportOptions.Default;
 
         // Validate inputs
-        _pathValidator.ValidateTemplatePath(templatePath);
         _pathValidator.ValidateOutputFilePath(outputFilePath);
 
         var waypointList = waypoints.ToList();
@@ -488,67 +485,53 @@ public class RouteExporter : IRouteExporter
             }
         }
 
-        // Load template
-        var templateXml = await LoadTemplateAsync(templatePath, cancellationToken);
-
-        // Generate WayPoint elements
-        var waypointElements = GenerateWaypointElements(waypointList);
-
-        // Inject waypoints into template
-        var finalXml = InjectWaypointsIntoTemplate(templateXml, waypointElements);
+        // Generate XML with embedded template structure
+        var finalXml = GenerateRouteXml(waypointList);
 
         // Write to file
-        await File.WriteAllTextAsync(outputFilePath, finalXml, cancellationToken);
+        await File.WriteAllTextAsync(outputFilePath, finalXml.ToString(), cancellationToken);
 
         _logger.LogInformation(
             "Exported {Count} waypoints to {Path}",
             waypointList.Count, outputFilePath);
     }
 
-    private async Task<XDocument> LoadTemplateAsync(string templatePath, 
-        CancellationToken cancellationToken)
+    private XDocument GenerateRouteXml(List<RouteWaypoint> waypoints)
     {
-        try
-        {
-            var xml = await File.ReadAllTextAsync(templatePath, cancellationToken);
-            return XDocument.Parse(xml);
-        }
-        catch (XmlException ex)
-        {
-            throw new InvalidOperationException("Template XML is invalid", ex);
-        }
-    }
+        var mmsi = waypoints.FirstOrDefault()?.Name ?? "Unknown";
 
-    private List<XElement> GenerateWaypointElements(List<RouteWaypoint> waypoints)
-    {
-        var elements = new List<XElement>();
+        var routeTemplate = new XElement("RouteTemplate",
+            new XAttribute("Name", mmsi),
+            new XAttribute("ColorR", "1"),
+            new XAttribute("ColorG", "124"),
+            new XAttribute("ColorB", "139"));
 
         foreach (var wp in waypoints)
         {
-            var element = new XElement("WayPoint",
-                new XElement("Time", wp.Time.ToString("o")), // ISO 8601
-                new XElement("Lat", wp.Lat.ToString("F6", CultureInfo.InvariantCulture)),
-                new XElement("Lon", wp.Lon.ToString("F6", CultureInfo.InvariantCulture)),
-                new XElement("Speed", wp.Speed.ToString("F2", CultureInfo.InvariantCulture)),
-                new XElement("Heading", wp.Heading.ToString())
+            var waypointElement = new XElement("WayPoint",
+                new XAttribute("Name", wp.Name),
+                new XAttribute("Lat", wp.Lat.ToString("F6", CultureInfo.InvariantCulture)),
+                new XAttribute("Lon", wp.Lon.ToString("F6", CultureInfo.InvariantCulture)),
+                new XAttribute("Alt", wp.Alt),
+                new XAttribute("Speed", wp.Speed.ToString("F2", CultureInfo.InvariantCulture)),
+                new XAttribute("ETA", wp.ETA),
+                new XAttribute("Delay", wp.Delay),
+                new XAttribute("Mode", wp.Mode),
+                new XAttribute("TrackMode", wp.TrackMode),
+                new XAttribute("Heading", wp.Heading),
+                new XAttribute("PortXTE", wp.PortXTE),
+                new XAttribute("StbdXTE", wp.StbdXTE),
+                new XAttribute("MinSpeed", wp.MinSpeed),
+                new XAttribute("MaxSpeed", wp.MaxSpeed.ToString("F2", CultureInfo.InvariantCulture))
             );
 
-            elements.Add(element);
+            routeTemplate.Add(waypointElement);
         }
 
-        return elements;
-    }
-
-    private XDocument InjectWaypointsIntoTemplate(XDocument template, 
-        List<XElement> waypointElements)
-    {
-        // Find <Route> element and inject waypoints
-        var routeElement = template.Descendants("Route").FirstOrDefault();
-        if (routeElement == null)
-            throw new InvalidOperationException("Template missing <Route> element");
-
-        // Remove existing WayPoint elements (if any)
-        routeElement.Elements("WayPoint").Remove();
+        var rootElement = new XElement("RouteTemplates", routeTemplate);
+        return new XDocument(
+            new XDeclaration("1.0", "utf-8", null),
+            rootElement);
 
         // Add new waypoints
         routeElement.Add(waypointElements);
@@ -999,7 +982,6 @@ public async Task EndToEnd_LoadOptimizeExport_ProducesValidXml()
     var exporter = provider.GetRequiredService<IRouteExporter>();
     await exporter.ExportRouteAsync(
         waypoints,
-        Path.Combine(testInputPath, "route_waypoint_template.xml"),
         testOutputPath);
 
     // Assert

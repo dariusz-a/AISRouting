@@ -1,11 +1,10 @@
 # Exporting Routes
 
 ## Overview
-This section describes how to export the generated route into an XML file that follows the route_waypoint_template.xml metadata. The export produces a single RouteTemplate containing all generated WayPoint elements.
+This section describes how to export the generated route into an XML file with a standard route template structure. The export produces a RouteTemplates root element containing a single RouteTemplate with all generated WayPoint elements.
 
 ## Prerequisites
 - A generated track (Create Track) for a selected ship and time interval
-- route_waypoint_template.xml present in the application directory
 
 ## Step-by-Step Instructions
 ### Export Steps
@@ -33,7 +32,7 @@ For each AIS record included in the selected time range the following mapping ap
 - MaxSpeed: computed as the maximum SOG observed in the selected range (zeros ignored where possible)
 
 ## Tips and Best Practices
-- Keep a consistent route_waypoint_template.xml in the application root to ensure color and template metadata are applied.
+- The application uses embedded template attributes (color, cross-track error tolerances) for consistent exports.
 - Use the prompt decision when filename conflicts occur to avoid accidental overwrites.
 
 ## Related Sections

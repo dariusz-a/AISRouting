@@ -7,20 +7,15 @@ A short summary linking core flows: select input root, pick ship/time, create tr
 ## Positive Scenarios
 
 ### Scenario Outline: End-to-end create and export flow
-	Given the application has an input root containing a vessel folder named "<mmsi>" and `route_waypoint_template.xml` is present and a generated track exists for "<mmsi>" covering start "<start>" and end "<end>".
+	Given the application has an input root containing a vessel folder named "<mmsi>" and a generated track exists for "<mmsi>" covering start "<start>" and end "<end>".
 	When the simulator user "<user_id>" uses the UI export flow by clicking the Export button and confirming the output folder "<output_path>".
-	Then a file named "<mmsi>-<start>-<end>.xml" should be created at "<output_path>" and the file should contain a single `<RouteTemplate Name="<mmsi>">` element with an ordered list of `<WayPoint/>` elements where each waypoint includes mapped attributes (Name, Lat, Lon, Alt=0, Speed, ETA or 0, Delay=0, Mode, TrackMode="Track", Heading or 0, PortXTE=20, StbdXTE=20, MinSpeed=0, MaxSpeed).
+	Then a file named "<mmsi>-<start>-<end>.xml" should be created at "<output_path>" and the file should contain a single `<RouteTemplate Name="<mmsi>">` element wrapped in `<RouteTemplates>` with an ordered list of `<WayPoint/>` elements where each waypoint includes mapped attributes (Name, Lat, Lon, Alt=0, Speed, ETA or 0, Delay=0, Mode, TrackMode="Track", Heading or 0, PortXTE=20, StbdXTE=20, MinSpeed=0, MaxSpeed).
 
 ### Examples:
  	| mmsi | start | end | user_id | output_path |
  	| mmsi-1 | ts_first | ts_last | scenario-user | export_tmp |
 
 ## Negative & Edge Scenarios
-
-### Scenario: Fail export when template file missing
-	Given the input root contains vessel folder "205196000" and a generated track exists and `route_waypoint_template.xml` is absent.
-	When the user clicks the Export button and confirms an output folder.
-	Then a visible error banner with text "route_waypoint_template.xml not found" should be shown and no file should be created.
 
 ### Scenario: Fail export when output path not writable
 	Given a generated track exists for "205196000" and the user selects output folder "C:\\protected\\exports" which the application cannot create or write to.
@@ -41,16 +36,6 @@ A short summary linking core flows: select input root, pick ship/time, create tr
 
 Reference: the happy path is defined above in "Scenario Outline: End-to-end create and export flow"; do not duplicate that scenario here.
 
-@critical @nhp @validation
-Scenario Outline: Block export when template file is missing
-	Given the application has an input root containing vessel folder "<mmsi>" and a generated track exists for "<mmsi>" and `route_waypoint_template.xml` is absent and the user "<user_id>" is logged in.
-	When the user clicks the Export button and confirms the output folder "<output_path>".
-	Then a visible error banner with text "route_waypoint_template.xml not found" is displayed and no file is created at "<output_path>".
-
-Examples:
-	| mmsi | user_id | output_path |
-	| mmsi-1 | scenario-user | export_tmp |
-
 @critical @nhp @auth
 Scenario Outline: Prevent export for user without export privileges
 	Given a generated track exists for "<mmsi>" and the logged-in user "<user_id>" lacks export privileges.
@@ -63,7 +48,7 @@ Examples:
 
 @critical @nhp @timeout
 Scenario Outline: Show error when export fails due to write timeout
-	Given a generated track exists for "<mmsi>" and `route_waypoint_template.xml` is present and the user "<user_id>" is logged in and the storage backend will return a write timeout for writes to "<output_path>".
+	Given a generated track exists for "<mmsi>" and the user "<user_id>" is logged in and the storage backend will return a write timeout for writes to "<output_path>".
 	When the user initiates export and confirms the output folder "<output_path>".
 	Then a visible error banner with text "Unable to save export: write timeout" is shown and no partial file remains in "<output_path>".
 

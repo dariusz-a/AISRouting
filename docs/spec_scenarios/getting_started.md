@@ -1,12 +1,12 @@
 <!-- Source: /docs/user_manual/getting_started.md -->
 # Feature: Getting Started
-This feature explains initial setup: placing `route_waypoint_template.xml`, selecting input data root, and starting the UI.
+This feature explains initial setup: installing the application, selecting input data root, and starting the UI.
 <!-- NOTE: The refinement guide requires `docs/workflow/inputs/mock_data.md` for concrete test values. That file is not present. Examples below are parameterized and include concrete example paths; replace with mock_data values when available. -->
 
 ## Positive Scenarios
 
 ### Scenario Outline: Install and start AISRouting UI
-	Given the AISRouting distribution is unpacked at "<install_path>" and `route_waypoint_template.xml` is placed at "<install_path>\\route_waypoint_template.xml".
+	Given the AISRouting distribution is unpacked at "<install_path>".
 	When the user executes the desktop application start action (double-click or run executable) from "<install_path>".
 	Then the application launches and the main screen is visible with the top-level navigation and the Input Folder selector control present.
 
@@ -25,11 +25,6 @@ This feature explains initial setup: placing `route_waypoint_template.xml`, sele
 	Given the file system path "C:\\empty\\root" contains no vessel subfolders and the application is running.
 	When the user opens the Input Folder selector and selects "C:\\empty\\root".
 	Then the ship selection combo box shows an empty list and an inline warning with text "No vessels found in input root" is displayed.
-
-### Scenario: Application warns when `route_waypoint_template.xml` missing
-	Given the application root does not contain `route_waypoint_template.xml` and the application is running.
-	When the user opens the Export dialog or prepares to export a generated track.
-	Then a warning banner with text "route_waypoint_template.xml not found — exports will fail until template is added" is shown.
 
 ### Scenario: Prevent start when executable missing or corrupted
 	Given the install path "C:\\apps\\AISRouting" lacks a valid start executable or it is corrupted.

@@ -1,7 +1,7 @@
 # AISRouting User Manual Summary
 
 ## Application Overview
-AISRouting ingests AIS CSV records, allows selecting a vessel and time range, creates an optimized track, and exports the route as an XML file following a provided route_waypoint_template.xml.
+AISRouting ingests AIS CSV records, allows selecting a vessel and time range, creates an optimized track, and exports the route as an XML file with a standard route template structure.
 
 ## Manual Sections
 ### [Getting Started](getting_started.md)
@@ -25,6 +25,6 @@ AISRouting ingests AIS CSV records, allows selecting a vessel and time range, cr
 
 ## Quick Reference
 - Filename format for export: MMSINumber-StartDate-EndDate.xml (UTC, YYYYMMDDTHHMMSS)
-- Default optimization parameters: heading change 0.2°, min distance 5m, SOG threshold 0.2 knots
+- Default optimization parameters: heading change 0.2ï¿½, min distance 5m, SOG threshold 0.2 knots
 - Output conflict behavior: prompts user to Overwrite / Suffix / Cancel
 

@@ -35,15 +35,6 @@ tech_design_file: docs/tech_design/overall_architecture.md
 test_file: tests/getting_started.spec.ts
 ```
 
-- Scenario: Application warns when `route_waypoint_template.xml` missing
-```yaml
-bdd_spec_file: docs/spec_scenarios/getting_started.md
-scenario: "Application warns when `route_waypoint_template.xml` missing"
-status: not started
-tech_design_file: docs/tech_design/overall_architecture.md
-test_file: tests/getting_started.spec.ts
-```
-
 - Scenario: Prevent start when executable missing or corrupted
 ```yaml
 bdd_spec_file: docs/spec_scenarios/getting_started.md
@@ -218,15 +209,6 @@ tech_design_file: docs/tech_design/api_integration_patterns.md
 test_file: tests/export_route.spec.ts
 ```
 
-- Scenario: Handle missing template file
-```yaml
-bdd_spec_file: docs/spec_scenarios/export_route.md
-scenario: "Handle missing template file"
-status: not started
-tech_design_file: docs/tech_design/api_integration_patterns.md
-test_file: tests/export_route.spec.ts
-```
-
 - Scenario: Append numeric suffix on filename conflict
 ```yaml
 bdd_spec_file: docs/spec_scenarios/export_route.md
@@ -258,15 +240,6 @@ tech_design_file: docs/tech_design/overall_architecture.md
 test_file: tests/aisrouting_summary.spec.ts
 ```
 
-- Scenario: Fail export when template file missing
-```yaml
-bdd_spec_file: docs/spec_scenarios/aisrouting_summary.md
-scenario: "Fail export when template file missing"
-status: not started
-tech_design_file: docs/tech_design/overall_architecture.md
-test_file: tests/aisrouting_summary.spec.ts
-```
-
 - Scenario: Fail export when output path not writable
 ```yaml
 bdd_spec_file: docs/spec_scenarios/aisrouting_summary.md
@@ -280,15 +253,6 @@ test_file: tests/aisrouting_summary.spec.ts
 ```yaml
 bdd_spec_file: docs/spec_scenarios/aisrouting_summary.md
 scenario: "Prevent export when user lacks permission"
-status: not started
-tech_design_file: docs/tech_design/overall_architecture.md
-test_file: tests/aisrouting_summary.spec.ts
-```
-
-- Scenario: Block export when template file is missing
-```yaml
-bdd_spec_file: docs/spec_scenarios/aisrouting_summary.md
-scenario: "Block export when template file is missing"
 status: not started
 tech_design_file: docs/tech_design/overall_architecture.md
 test_file: tests/aisrouting_summary.spec.ts

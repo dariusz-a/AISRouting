@@ -86,8 +86,7 @@ d:\repo\AISRouting
 │   │   └── Persistence/               # Data serialization
 │   └── AISRouting.Tests/              # Test project
 │       └── UnitTests/
-├── docs/                              # Documentation
-└── route_waypoint_template.xml        # XML template for export
+└── docs/                              # Documentation
 ```
 
 ## Key Architectural Patterns
@@ -319,8 +318,8 @@ dotnet publish src/AISRouting.App.WPF -c Release -r win-x64 --self-contained
 
 - Self-contained executable (includes .NET runtime)
 - Copy published files to target machine
-- Include `route_waypoint_template.xml` in application root
 - No installation required
+- XML template structure is embedded in the application
 
 ## Testing Strategy
 
