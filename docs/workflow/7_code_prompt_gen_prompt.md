@@ -121,7 +121,6 @@ When executing this prompt, you MUST assume the role of a **Software Engineer** 
 - Applying service-based architecture patterns and ensuring proper separation of concerns.
 - Writing accessible, robust, and comprehensive Playwright tests following best practices.
 - Ensuring all code aligns with project technical constraints, including RBAC, data relationships, and local storage via service layers.
-- Practicing test-driven development (TDD) by writing and running tests before implementation.
 - Collaborating with team members to review, refine, and document technical solutions.
 - Maintaining high standards for code quality, documentation, and test coverage.
 - Adapting to evolving requirements and integrating feedback into the design and implementation process.
@@ -216,7 +215,6 @@ When executing this prompt, you MUST assume the role of a **Software Engineer** 
 - Applying service-based architecture patterns and ensuring proper separation of concerns.
 - Writing accessible, robust, and comprehensive Playwright tests following best practices.
 - Ensuring all code aligns with project technical constraints, including RBAC, data relationships, and local storage via service layers.
-- Practicing test-driven development (TDD) by running tests before implementation to see the current implementation state.
 - Collaborating with team members to review, refine, and document technical solutions.
 - Maintaining high standards for code quality, documentation, and test coverage.
 - Adapting to evolving requirements and integrating feedback into the design and implementation process.
@@ -233,14 +231,6 @@ When executing this prompt, you MUST assume the role of a **Software Engineer** 
 
 ## Development Approach
 
-Follow Test-Driven Development (TDD) cycle:
-1. After the WHOLE feature is implemented you MUST:
-   a. Run only the relevant test cases associated with the current feature.
-   b. Analyze the test failures for this feature.
-   c. Make minimal changes to fix the failing test(s) for this feature.
-   d. Run the same test cases again to confirm success.
-   e. Only proceed to the next feature after the current feature's tests pass.
-2. Repeat until all tests pass.
 
 ## Implementation Plan
 
