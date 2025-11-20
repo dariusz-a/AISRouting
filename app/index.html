@@ -61,6 +61,25 @@
             <h3 id="trackResultsTitle">Track Results</h3>
             <ul data-testid="track-results-list" aria-live="polite"></ul>
           </section>
+          <!-- Export controls -->
+          <section role="region" aria-labelledby="exportTitle" data-testid="export-section">
+            <h3 id="exportTitle">Export</h3>
+            <button type="button" data-testid="export-button">Export</button>
+            <input type="text" data-testid="export-output-folder" placeholder="Output folder" />
+            <button type="button" data-testid="export-confirm">Confirm Export</button>
+
+            <!-- Conflict prompt dialog -->
+            <div role="dialog" aria-labelledby="exportConflictTitle" data-testid="export-conflict-prompt" style="display:none;">
+              <h4 id="exportConflictTitle">File exists</h4>
+              <p>Choose how to handle existing file</p>
+              <button type="button" data-testid="export-conflict-overwrite">Overwrite</button>
+              <button type="button" data-testid="export-conflict-suffix">Append numeric suffix</button>
+              <button type="button" data-testid="export-conflict-cancel">Cancel</button>
+            </div>
+
+            <div role="status" aria-live="polite" data-testid="export-success" style="display:none;color:green;">Export successful</div>
+            <div role="alert" aria-live="assertive" data-testid="export-error" style="display:none;color:red;"></div>
+          </section>
       </section>
     </main>
   </body>

@@ -8,9 +8,9 @@ test.describe('Feature: Create Track', () => {
     // Navigate to app (assuming local dev server or file-based harness)
     await page.goto('/');
     // Perform login using required credentials
-    await page.getByRole('textbox', { name: 'Email' }).fill('alice.smith@company.com');
-    await page.getByRole('textbox', { name: 'Password' }).fill('SecurePass123!');
-    await page.getByRole('button', { name: 'Login' }).click();
+    await page.getByTestId('username-input').fill('alice.smith@company.com');
+    await page.getByTestId('password-input').fill('SecurePass123!');
+    await page.getByTestId('submit-login-btn').click();
     await expect(page).toHaveURL(/.*/);
   });
 
@@ -22,12 +22,12 @@ test.describe('Feature: Create Track', () => {
     // Select vessel
     await selectVessel(page, mmsi);
 
-    // Set start/stop pickers (assumes accessible labels)
-    await page.getByLabel('Start').fill('2025-03-15T00:00:01');
-    await page.getByLabel('Stop').fill('2025-03-15T00:10:01');
+    // Set start/stop pickers (use testids)
+    await page.getByTestId('start-picker').fill('2025-03-15T00:00:01');
+    await page.getByTestId('stop-picker').fill('2025-03-15T00:10:01');
 
     // Click Create Track
-    await page.getByRole('button', { name: 'Create Track' }).click();
+    await page.getByTestId('create-track').click();
 
     // Wait for results
     await waitForTrackReady(page);
@@ -44,10 +44,10 @@ test.describe('Feature: Create Track', () => {
     await selectVessel(page, mockVessel205196000.mmsi);
 
     // Narrow time window (assumes these timestamps intersect noisy.csv)
-    await page.getByLabel('Start').fill('2025-03-15T00:00:01');
-    await page.getByLabel('Stop').fill('2025-03-15T00:00:10');
+    await page.getByTestId('start-picker').fill('2025-03-15T00:00:01');
+    await page.getByTestId('stop-picker').fill('2025-03-15T00:00:10');
 
-    await page.getByRole('button', { name: 'Create Track' }).click();
+    await page.getByTestId('create-track').click();
     await waitForTrackReady(page);
 
     const list = page.getByTestId('track-results-list');
@@ -61,7 +61,7 @@ test.describe('Feature: Create Track', () => {
 
   test('Reject track creation when no ship selected', async ({ page }) => {
     // Ensure no vessel selected (assumes UI starts with none)
-    await page.getByRole('button', { name: 'Create Track' }).click();
+    await page.getByTestId('create-track').click();
     await expect(page.getByText('No ship selected')).toBeVisible();
     // Ensure results not shown
     expect(await elementExists(page.getByTestId('track-results-list'))).toBe(false);
@@ -69,9 +69,9 @@ test.describe('Feature: Create Track', () => {
 
   test('Fail gracefully on malformed CSV rows', async ({ page }) => {
     await selectVessel(page, mockVessel205196000.mmsi);
-    await page.getByLabel('Start').fill('2025-03-15T00:00:01');
-    await page.getByLabel('Stop').fill('2025-03-15T00:10:01');
-    await page.getByRole('button', { name: 'Create Track' }).click();
+    await page.getByTestId('start-picker').fill('2025-03-15T00:00:01');
+    await page.getByTestId('stop-picker').fill('2025-03-15T00:10:01');
+    await page.getByTestId('create-track').click();
     await waitForTrackReady(page);
 
     await expect(page.getByText('Some rows were ignored due to invalid format')).toBeVisible();
@@ -82,9 +82,9 @@ test.describe('Feature: Create Track', () => {
 
   test('Handle missing Heading or SOG values in records', async ({ page }) => {
     await selectVessel(page, mockVessel205196000.mmsi);
-    await page.getByLabel('Start').fill('2025-03-15T00:00:01');
-    await page.getByLabel('Stop').fill('2025-03-15T00:10:01');
-    await page.getByRole('button', { name: 'Create Track' }).click();
+    await page.getByTestId('start-picker').fill('2025-03-15T00:00:01');
+    await page.getByTestId('stop-picker').fill('2025-03-15T00:10:01');
+    await page.getByTestId('create-track').click();
     await waitForTrackReady(page);
 
     // Check for data-quality note
@@ -100,13 +100,13 @@ test.describe('Feature: Create Track', () => {
     // Open ship selection combo
     await page.getByTestId('ship-combo').click();
     await expect(page.getByText('No vessels found in input root')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Create Track' })).toBeDisabled();
+    await expect(page.getByTestId('create-track')).toBeDisabled();
   });
 
   test('Create track unavailable for user without permission', async ({ page }) => {
     // This assumes either a user fixture or mocked permission service
     // Attempt to hover the disabled button to show tooltip
-    const btn = page.getByRole('button', { name: 'Create Track' });
+    const btn = page.getByTestId('create-track');
     await expect(btn).toBeDisabled();
     await btn.hover();
     await expect(page.getByText('Insufficient privileges')).toBeVisible();

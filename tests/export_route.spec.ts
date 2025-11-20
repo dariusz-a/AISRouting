@@ -6,9 +6,9 @@ import { sampleShipDataOut } from './fixtures/exportRouteFixtures';
 // Helper: login using credentials specified in QA_playwright_authentication.md
 async function loginAsScenarioUser(page: Page) {
   await page.goto('/');
-  await page.getByLabel('Email').fill('alice.smith@company.com');
-  await page.getByLabel('Password').fill('SecurePass123!');
-  await page.getByRole('button', { name: /sign in|login/i }).click();
+  await page.getByTestId('username-input').fill('alice.smith@company.com');
+  await page.getByTestId('password-input').fill('SecurePass123!');
+  await page.getByTestId('submit-login-btn').click();
   await expect(page).toHaveURL(/.*dashboard|.*home/);
 }
 
@@ -40,7 +40,7 @@ test.describe('Feature: Exporting Routes', () => {
     // Act: open export dialog and perform export
     await page.getByTestId('export-button').click();
     await page.getByTestId('export-output-folder').fill(tmpDir);
-    await page.getByRole('button', { name: /confirm|export/i }).click();
+    await page.getByTestId('export-confirm').click();
 
     // Assert: expected file exists
     // Filename pattern: <mmsi>-<start>-<end>.xml - we look for any .xml in tmpDir
@@ -65,7 +65,7 @@ test.describe('Feature: Exporting Routes', () => {
     // Trigger export
     await page.getByTestId('export-button').click();
     await page.getByTestId('export-output-folder').fill(tmpDir);
-    await page.getByRole('button', { name: /confirm|export/i }).click();
+    await page.getByTestId('export-confirm').click();
 
     // When conflict prompt appears, choose overwrite
     const prompt = page.getByTestId('export-conflict-prompt');
@@ -85,18 +85,18 @@ test.describe('Feature: Exporting Routes', () => {
     const protectedDir = path.join(process.cwd(), 'protected_exports_' + Date.now());
     fs.mkdirSync(protectedDir, { recursive: true });
     try {
-      // On Windows, make read-only by removing write permissions via fs.chmod if supported
-      // Fallback: use existing protected path in BDD (C:\protected\exports) if present
-        try { fs.chmodSync(protectedDir, 0o444); } catch (e) { /* ignore if not supported */ }
+      // Attempt to make the folder read-only. Do not silently swallow errors.
+      fs.chmodSync(protectedDir, 0o444);
 
       await page.getByTestId('export-button').click();
       await page.getByTestId('export-output-folder').fill(protectedDir);
-      await page.getByRole('button', { name: /confirm|export/i }).click();
+      await page.getByTestId('export-confirm').click();
 
       await expect(page.getByTestId('export-error')).toHaveText(new RegExp(`Cannot write to output path: ${protectedDir.replace(/\\/g, '\\\\')}`));
 
     } finally {
-      try { fs.chmodSync(protectedDir, 0o777); } catch (e) { /* ignore */ }
+        // Restore permissions and remove folder. Propagate errors rather than swallowing them.
+        fs.chmodSync(protectedDir, 0o777);
       fs.rmSync(protectedDir, { recursive: true, force: true });
     }
   });
@@ -109,11 +109,11 @@ test.describe('Feature: Exporting Routes', () => {
 
     await page.getByTestId('export-button').click();
     await page.getByTestId('export-output-folder').fill(tmpDir);
-    await page.getByRole('button', { name: /confirm|export/i }).click();
+    await page.getByTestId('export-confirm').click();
 
     const prompt = page.getByTestId('export-conflict-prompt');
     await expect(prompt).toBeVisible();
-    await prompt.getByRole('button', { name: /append numeric suffix|suffix/i }).click();
+    await page.getByTestId('export-conflict-suffix').click();
 
     // Look for new file with (1) appended
     const files = fs.readdirSync(tmpDir).filter((f: string) => f.endsWith('.xml'));
@@ -130,7 +130,7 @@ test.describe('Feature: Exporting Routes', () => {
 
     await page.getByTestId('export-button').click();
     await page.getByTestId('export-output-folder').fill(tmpDir);
-    await page.getByRole('button', { name: /confirm|export/i }).click();
+    await page.getByTestId('export-confirm').click();
 
     const files = fs.readdirSync(tmpDir).filter(f => f.endsWith('.xml'));
     expect(files.length).toBeGreaterThan(0);
