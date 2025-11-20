@@ -7,7 +7,7 @@
         xmlns:views="clr-namespace:AISRouting.App.WPF.Views"
         xmlns:converters="clr-namespace:AISRouting.App.WPF.Converters"
         mc:Ignorable="d"
-        Title="AISRouting" Height="700" Width="1000" MinHeight="700" MinWidth="1000">
+        Title="AISRouting" Height="1000" Width="1000" MinHeight="850" MinWidth="1000">
     
     <Window.Resources>
         <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
