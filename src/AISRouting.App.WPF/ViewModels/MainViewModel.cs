@@ -220,6 +220,14 @@ namespace AISRouting.App.WPF.ViewModels
                 );
 
                 var waypointList = waypoints.ToList();
+                // Ensure each generated waypoint has the vessel MMSI set as Name
+                var vesselMmsi = SelectedVessel?.MMSI.ToString() ?? string.Empty;
+                if (!string.IsNullOrEmpty(vesselMmsi))
+                {
+                    foreach (var wp in waypointList)
+                        wp.Name = vesselMmsi;
+                }
+
                 GeneratedWaypoints = new ObservableCollection<RouteWaypoint>(waypointList);
 
                 var positionCount = positionList.Count;
