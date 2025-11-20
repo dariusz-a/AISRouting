@@ -46,6 +46,12 @@ namespace AISRouting.App.WPF.ViewModels
         [ObservableProperty]
         private string _stopTimeString;
 
+        [ObservableProperty]
+        private DateTime? _startDate;
+
+        [ObservableProperty]
+        private DateTime? _stopDate;
+
         public ShipSelectionViewModel(
             ISourceDataScanner scanner,
             IFolderDialogService folderDialog,
@@ -122,8 +128,12 @@ namespace AISRouting.App.WPF.ViewModels
 
             StaticDataDisplay = FormatStaticData(value);
 
+            // Update both TimeInterval and the separate date properties
             TimeInterval.Start = value.MinDate;
             TimeInterval.Stop = value.MaxDate.AddDays(1);
+
+            StartDate = TimeInterval.Start;
+            StopDate = TimeInterval.Stop;
 
             // Update time strings
             StartTimeString = TimeInterval.Start.ToString("HH:mm:ss");
@@ -132,6 +142,28 @@ namespace AISRouting.App.WPF.ViewModels
             ValidateTimeInterval();
 
             _logger.LogInformation("Selected vessel: {MMSI} ({Name})", value.MMSI, value.DisplayName);
+        }
+
+        partial void OnStartDateChanged(DateTime? value)
+        {
+            if (value.HasValue)
+            {
+                // Preserve the time component from TimeInterval.Start
+                var time = TimeInterval.Start.TimeOfDay;
+                TimeInterval.Start = value.Value.Date + time;
+                ValidateTimeInterval();
+            }
+        }
+
+        partial void OnStopDateChanged(DateTime? value)
+        {
+            if (value.HasValue)
+            {
+                // Preserve the time component from TimeInterval.Stop
+                var time = TimeInterval.Stop.TimeOfDay;
+                TimeInterval.Stop = value.Value.Date + time;
+                ValidateTimeInterval();
+            }
         }
 
         partial void OnStartTimeStringChanged(string value)
