@@ -24,10 +24,10 @@
         <!-- Ship Selection View -->
         <views:ShipSelectionView Grid.Row="0" 
                                  DataContext="{Binding ShipSelectionViewModel}"
-                                 Margin="0,0,0,10" />
+                                 Margin="0,0,0,0" />
 
         <!-- Track Results Panel -->
-        <GroupBox Grid.Row="1" Header="Track Results" Margin="0,0,0,10">
+        <GroupBox Grid.Row="1" Header="Track Results" Margin="10,0,10,10">
             <Grid Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -116,8 +116,13 @@
                 </Border>
 
                 <!-- Track Results DataGrid -->
-                <StackPanel Grid.Row="4" Orientation="Vertical">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,5">
+                <Grid Grid.Row="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,5">
                         <Button Content="Show Comparison"
                                 Command="{Binding ShowComparisonCommand}"
                                 Width="140"
@@ -126,7 +131,7 @@
                                 AutomationProperties.Name="Show Track Comparison"/>
                     </StackPanel>
 
-                    <DataGrid
+                    <DataGrid Grid.Row="1"
                           ItemsSource="{Binding GeneratedWaypoints}"
                           AutoGenerateColumns="False"
                           IsReadOnly="True"
@@ -135,7 +140,9 @@
                           SelectionMode="Single"
                           GridLinesVisibility="All"
                           HeadersVisibility="Column"
-                          AlternatingRowBackground="#F5F5F5">
+                          AlternatingRowBackground="#F5F5F5"
+                          VerticalAlignment="Stretch"
+                          ScrollViewer.VerticalScrollBarVisibility="Visible">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Index" Binding="{Binding Index}" Width="60"/>
                             <DataGridTextColumn Header="Latitude" Binding="{Binding Lat, StringFormat=F6}" Width="100"/>
@@ -145,7 +152,7 @@
                             <DataGridTextColumn Header="Time" Binding="{Binding Time, StringFormat='yyyy-MM-dd HH:mm:ss'}" Width="150"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                </StackPanel>
+                </Grid>
             </Grid>
         </GroupBox>
 
