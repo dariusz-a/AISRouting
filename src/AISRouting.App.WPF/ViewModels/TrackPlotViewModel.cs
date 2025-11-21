@@ -24,8 +24,13 @@ namespace AISRouting.App.WPF.ViewModels
             plt.Clear();
 
             plt.Title(title);
-            plt.XLabel("Longitude");
-            plt.YLabel("Latitude");
+            plt.XLabel("Longitude (deg)");
+            plt.YLabel("Latitude (deg)");
+            // Convert input coordinates from radians back to degrees using: degrees = radians / PI * 180
+            double[] ToDegrees(double[] arr) => arr == null ? Array.Empty<double>() : arr.Select(r => r / Math.PI * 180.0).ToArray();
+
+            var optimizedLonsDeg = ToDegrees(optimizedLons);
+            var optimizedLatsDeg = ToDegrees(optimizedLats);
             try
             {
                 var legend = plt.Legend;
@@ -44,7 +49,7 @@ namespace AISRouting.App.WPF.ViewModels
             }
             catch { }
 
-            _optimizedScatter = plt.Add.Scatter(optimizedLons, optimizedLats);
+            _optimizedScatter = plt.Add.Scatter(optimizedLonsDeg, optimizedLatsDeg);
             try
             {
                 var tOpt = _optimizedScatter!.GetType();

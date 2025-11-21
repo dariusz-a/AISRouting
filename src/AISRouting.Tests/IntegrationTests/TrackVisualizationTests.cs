@@ -109,17 +109,18 @@ namespace AISRouting.Tests.IntegrationTests
 
             // Configure plot appearance
             plot.Title($"Track Optimization - MMSI {mmsi}");
-            plot.XLabel("Longitude");
-            plot.YLabel("Latitude");
+            plot.XLabel("Longitude (deg)");
+            plot.YLabel("Latitude (deg)");
             plot.Legend.IsVisible = true;
 
-            // Extract coordinates for initial positions
+            // Extract coordinates for initial positions (convert radians -> degrees)
+            double[] ToDegrees(double[] arr) => arr == null ? Array.Empty<double>() : arr.Select(r => r / Math.PI * 180.0).ToArray();
             var initialLons = initialPositions.Select(p => (double)p.Lon!.Value).ToArray();
             var initialLats = initialPositions.Select(p => (double)p.Lat!.Value).ToArray();
 
-            // Extract coordinates for optimized waypoints
-            var optimizedLons = optimizedWaypoints.Select(w => w.Lon).ToArray();
-            var optimizedLats = optimizedWaypoints.Select(w => w.Lat).ToArray();
+            // Extract coordinates for optimized waypoints (convert radians -> degrees)
+            var optimizedLons = ToDegrees(optimizedWaypoints.Select(w => w.Lon).ToArray());
+            var optimizedLats = ToDegrees(optimizedWaypoints.Select(w => w.Lat).ToArray());
 
             // Plot initial positions as a line with small markers
             var initialScatter = plot.Add.Scatter(initialLons, initialLats);
