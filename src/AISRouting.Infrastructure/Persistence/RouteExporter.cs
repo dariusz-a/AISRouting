@@ -119,7 +119,7 @@ namespace AISRouting.Infrastructure.Persistence
                     new XAttribute("Speed", wp.Speed.ToString("F2", CultureInfo.InvariantCulture)),
                     new XAttribute("ETA", wp.ETA),
                     new XAttribute("Delay", wp.Delay),
-                    new XAttribute("Mode", string.IsNullOrEmpty(wp.Mode) ? "Waypoint" : wp.Mode),
+                    new XAttribute("Mode", "Cruise"),
                     new XAttribute("TrackMode", "Track"),
                     new XAttribute("Heading", wp.Heading),
                     new XAttribute("PortXTE", wp.PortXTE),

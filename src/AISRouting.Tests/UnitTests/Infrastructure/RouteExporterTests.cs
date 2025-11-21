@@ -204,7 +204,7 @@ namespace AISRouting.Tests.UnitTests.Infrastructure
             waypointElement.Attribute("Speed")!.Value.Should().Be("12.50");
             waypointElement.Attribute("ETA")!.Value.Should().Be("0");
             waypointElement.Attribute("Delay")!.Value.Should().Be("0");
-            waypointElement.Attribute("Mode")!.Value.Should().Be("Waypoint");
+            waypointElement.Attribute("Mode")!.Value.Should().Be("Cruise");
             waypointElement.Attribute("TrackMode")!.Value.Should().Be("Track");
             waypointElement.Attribute("Heading")!.Value.Should().Be("180");
             waypointElement.Attribute("PortXTE")!.Value.Should().Be("20");

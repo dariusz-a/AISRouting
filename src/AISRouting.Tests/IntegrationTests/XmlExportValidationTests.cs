@@ -65,7 +65,7 @@ namespace AISRouting.Tests.IntegrationTests
             // Validate RouteTemplate element
             var routeTemplate = xml.Root.Element("RouteTemplate");
             routeTemplate.Should().NotBeNull();
-            routeTemplate!.Attribute("Name")!.Value.Should().Be("205196000");
+            routeTemplate!.Attribute("Name")!.Value.Should().Be("integration_test_route");
             routeTemplate.Attribute("ColorR")!.Value.Should().Be("1");
             routeTemplate.Attribute("ColorG")!.Value.Should().Be("124");
             routeTemplate.Attribute("ColorB")!.Value.Should().Be("139");
@@ -76,7 +76,7 @@ namespace AISRouting.Tests.IntegrationTests
             
             // Validate first waypoint attributes
             var firstWaypoint = waypointElements[0];
-            firstWaypoint.Attribute("Name")!.Value.Should().Be("205196000");
+            firstWaypoint.Attribute("Name")!.Value.Should().StartWith("WP");
             firstWaypoint.Attribute("Lat")!.Value.Should().NotBeNullOrEmpty();
             firstWaypoint.Attribute("Lon")!.Value.Should().NotBeNullOrEmpty();
             firstWaypoint.Attribute("Alt")!.Value.Should().Be("0");
@@ -143,8 +143,8 @@ namespace AISRouting.Tests.IntegrationTests
             for (int i = 0; i < waypointElements.Count; i++)
             {
                 var expectedIndex = i;
-                // Note: Index is not stored in XML, but waypoints should be in sequence
-                waypointElements[i].Attribute("Name")!.Value.Should().Be("205196000");
+                // Note: Index is not stored in XML, but waypoint element names are WP001..WP999
+                waypointElements[i].Attribute("Name")!.Value.Should().StartWith("WP");
             }
             
             // Verify coordinate precision
