@@ -68,10 +68,116 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Vessel ComboBox -->
+                <!-- Filter Section -->
                 <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Name filter -->
+                    <TextBlock Grid.Row="0" Grid.Column="0"
+                               Text="Name filter (regex):"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,0"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="4"
+                             Text="{Binding NameFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             VerticalAlignment="Center"
+                             AutomationProperties.AutomationId="name-filter"
+                             AutomationProperties.Name="Name Filter"/>
+
+                    <!-- Length range -->
+                    <TextBlock Grid.Row="1" Grid.Column="0"
+                               Text="Length (m):"
+                               VerticalAlignment="Center"
+                               Margin="0,6,10,0"/>
+                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="0,6,0,0">
+                        <TextBox Text="{Binding LengthMinString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="60"
+                                 VerticalAlignment="Center"
+                                 Margin="0,0,5,0"
+                                 AutomationProperties.AutomationId="length-min-text"
+                                 AutomationProperties.Name="Length Min"/>
+                        <Slider Minimum="0"
+                                Maximum="{Binding MaxLengthLimit}"
+                                Value="{Binding LengthMin, Mode=TwoWay}"
+                                Width="150"
+                                VerticalAlignment="Center"
+                                Margin="5,0"
+                                TickFrequency="10"
+                                IsSnapToTickEnabled="False"
+                                AutomationProperties.AutomationId="length-min-slider"
+                                AutomationProperties.Name="Length Min Slider"/>
+                        <Slider Minimum="0"
+                                Maximum="{Binding MaxLengthLimit}"
+                                Value="{Binding LengthMax, Mode=TwoWay}"
+                                Width="150"
+                                VerticalAlignment="Center"
+                                Margin="5,0"
+                                TickFrequency="10"
+                                IsSnapToTickEnabled="False"
+                                AutomationProperties.AutomationId="length-max-slider"
+                                AutomationProperties.Name="Length Max Slider"/>
+                        <TextBox Text="{Binding LengthMaxString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="60"
+                                 VerticalAlignment="Center"
+                                 Margin="5,0,0,0"
+                                 AutomationProperties.AutomationId="length-max-text"
+                                 AutomationProperties.Name="Length Max"/>
+                    </StackPanel>
+
+                    <!-- Width (beam) range -->
+                    <TextBlock Grid.Row="2" Grid.Column="0"
+                               Text="Width (m):"
+                               VerticalAlignment="Center"
+                               Margin="0,6,10,0"/>
+                    <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal" Margin="0,6,0,0">
+                        <TextBox Text="{Binding BeamMinString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="60"
+                                 VerticalAlignment="Center"
+                                 Margin="0,0,5,0"
+                                 AutomationProperties.AutomationId="beam-min-text"
+                                 AutomationProperties.Name="Beam Min"/>
+                        <Slider Minimum="0"
+                                Maximum="{Binding MaxBeamLimit}"
+                                Value="{Binding BeamMin, Mode=TwoWay}"
+                                Width="150"
+                                VerticalAlignment="Center"
+                                Margin="5,0"
+                                TickFrequency="5"
+                                IsSnapToTickEnabled="False"
+                                AutomationProperties.AutomationId="beam-min-slider"
+                                AutomationProperties.Name="Beam Min Slider"/>
+                        <Slider Minimum="0"
+                                Maximum="{Binding MaxBeamLimit}"
+                                Value="{Binding BeamMax, Mode=TwoWay}"
+                                Width="150"
+                                VerticalAlignment="Center"
+                                Margin="5,0"
+                                TickFrequency="5"
+                                IsSnapToTickEnabled="False"
+                                AutomationProperties.AutomationId="beam-max-slider"
+                                AutomationProperties.Name="Beam Max Slider"/>
+                        <TextBox Text="{Binding BeamMaxString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="60"
+                                 VerticalAlignment="Center"
+                                 Margin="5,0,0,0"
+                                 AutomationProperties.AutomationId="beam-max-text"
+                                 AutomationProperties.Name="Beam Max"/>
+                    </StackPanel>
+
+                </Grid>
+
+                <!-- Vessel ComboBox -->
+                <Grid Grid.Row="1" Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -83,7 +189,7 @@
                                Margin="0,0,10,0"/>
                     
                     <ComboBox Grid.Column="1"
-                              ItemsSource="{Binding AvailableVessels}"
+                              ItemsSource="{Binding FilteredVessels}"
                               SelectedItem="{Binding SelectedVessel}"
                               DisplayMemberPath="DisplayName"
                               IsEnabled="{Binding IsInputRootValid}"
@@ -92,7 +198,7 @@
                 </Grid>
 
                 <!-- Static Data Display -->
-                <GroupBox Grid.Row="1" Header="Ship Static Data">
+                <GroupBox Grid.Row="2" Header="Ship Static Data">
                     <TextBox Text="{Binding StaticDataDisplay, Mode=OneWay}"
                              IsReadOnly="True"
                              TextWrapping="Wrap"
