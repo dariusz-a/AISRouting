@@ -7,6 +7,8 @@ This document outlines the technical design for the Exporting Routes feature
 - Business Value: Provides users with a portable, standards-compatible route file that can be imported into navigation systems or shared with colleagues. Enables downstream usage of optimized tracks produced by the application.
 - High-level approach: Reuse existing layered architecture. The UI orchestration is in the Presentation layer (View + ViewModel). The export workflow delegates serialization and file-system concerns to `IRouteExporter` in Infrastructure. The mapping logic relies on domain models in Core (`RouteWaypoint`, `ShipDataOut`) and utility helpers (time formatting, filename generation). All file operations perform validation and permission checks before write.
 
+**IMPORTANT: Coordinate System** - RouteWaypoint objects store Lat/Lon in **RADIANS** (not degrees). Input CSV files contain coordinates in degrees, which MUST be converted to radians during track generation. The XML export writes these radians values directly. This ensures compatibility with navigation systems that expect the route_waypoint_template.xml format.
+
 ## Architectural Approach
 - Patterns applied: MVVM for UI, Service Layer for export API (`IRouteExporter`), Dependency Injection for testability, and Repository-like abstraction for filesystem operations to allow mocking in tests. Error handling follows established cross-cutting concerns: specific exceptions, user-friendly messages, and structured logging.
 - Component hierarchy and relationships:
@@ -19,8 +21,6 @@ This document outlines the technical design for the Exporting Routes feature
 
 ## File Structure
 Following `docs/tech_design/application_organization.md` conventions, add the following files and responsibilities for this feature:
-
-```
 src/AISRouting.App.WPF/
   Views/
     ExportDialogView.xaml            # Export options dialog UI
@@ -45,8 +45,6 @@ tests/
     XmlExportValidationTests.cs      # Validates generated XML structure and attributes
   UnitTests/
     RouteExporterTests.cs            # Unit tests for conflict handling and filename generation
-```
-
 Purpose notes:
 - `ExportDialogViewModel.cs`: Provides `IAsyncRelayCommand ExportCommand` and exposes `ExportResult` and `ErrorMessage` for UI binding.
 - `RouteExporter.cs`: Orchestrates filename generation, existence checks, user prompt handling (via `IMessageBoxService`), and calls `XmlRouteWriter.Write(waypoints, path)`.
@@ -112,32 +110,22 @@ Purpose notes:
 ## Implementation Examples
 
 1) Generate filename helper (illustrative C#):
-
-```csharp
 private string GenerateFilename(string mmsi, DateTime start, DateTime stop)
 {
     return $"{mmsi}-{start:yyyyMMddTHHmmss}-{stop:yyyyMMddTHHmmss}.xml";
 }
-```
-
 Explanation: Use `InvariantCulture` formatting and the exact pattern required by BDD to ensure deterministic filenames for tests.
 
 2) Compute MaxSpeed and map waypoints:
-
-```csharp
 var maxSog = waypoints.Select(w => w.Speed).DefaultIfEmpty(0).Max();
 foreach (var w in waypoints)
 {
     w.MaxSpeed = maxSog;
     w.Mode ??= SetWaypointModeFrom(w); // ensure Mode populated
 }
-```
-
 Explanation: `MaxSpeed` must be the maximum observed non-zero SOG; code uses DefaultIfEmpty to avoid exception on empty enumerables. `SetWaypointModeFrom` encapsulates logic to derive Mode.
 
 3) Xml writing sketch (illustrative C#):
-
-```csharp
 using (var writer = XmlWriter.Create(fullPath, settings))
 {
     writer.WriteStartDocument();
@@ -161,8 +149,6 @@ using (var writer = XmlWriter.Create(fullPath, settings))
     writer.WriteEndElement(); // RouteTemplates
     writer.WriteEndDocument();
 }
-```
-
 Explain: Use `CultureInfo.InvariantCulture` to ensure decimal separators are '.' and consistent across environments. Write attributes rather than element text to match spec.
 
 ## Testing Strategy and Quality Assurance

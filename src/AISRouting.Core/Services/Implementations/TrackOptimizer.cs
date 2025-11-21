@@ -55,7 +55,7 @@ namespace AISRouting.Core.Services.Implementations
             int defaultedHeading = 0;
             int defaultedSOG = 0;
 
-            // Convert positions to waypoints
+            // Convert positions to waypoints with Lat/Lon in RADIANS
             var waypoints = positions.Select((p, i) =>
             {
                 if (!p.Heading.HasValue) defaultedHeading++;
@@ -65,8 +65,8 @@ namespace AISRouting.Core.Services.Implementations
                 {
                     Index = i + 1,
                     Time = p.BaseDateTime,
-                    Lat = p.Lat ?? 0.0,
-                    Lon = p.Lon ?? 0.0,
+                    Lat = ToRadians(p.Lat ?? 0.0),  // Convert degrees to radians
+                    Lon = ToRadians(p.Lon ?? 0.0),  // Convert degrees to radians
                     Speed = p.SOG ?? 0.0,
                     Heading = p.Heading ?? 0,
                     Alt = 0,
@@ -181,15 +181,16 @@ namespace AISRouting.Core.Services.Implementations
         {
             // Calculate perpendicular distance from point to line segment
             // Using Haversine formula for geographic coordinates
+            // NOTE: waypoints already have Lat/Lon in radians, so no conversion needed
 
             const double earthRadius = 6371000; // meters
 
-            var lat1 = ToRadians(lineStart.Lat);
-            var lon1 = ToRadians(lineStart.Lon);
-            var lat2 = ToRadians(lineEnd.Lat);
-            var lon2 = ToRadians(lineEnd.Lon);
-            var latP = ToRadians(point.Lat);
-            var lonP = ToRadians(point.Lon);
+            var lat1 = lineStart.Lat;  // Already in radians
+            var lon1 = lineStart.Lon;  // Already in radians
+            var lat2 = lineEnd.Lat;    // Already in radians
+            var lon2 = lineEnd.Lon;    // Already in radians
+            var latP = point.Lat;      // Already in radians
+            var lonP = point.Lon;      // Already in radians
 
             // Calculate distance from point to start of line
             var dLat13 = latP - lat1;
