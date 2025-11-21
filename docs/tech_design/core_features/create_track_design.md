@@ -6,6 +6,8 @@ This document outlines the technical design for the Create Track feature.
 
 The Create Track feature generates an optimized route (sequence of waypoints) from AIS CSV records for a selected vessel and user-defined time range. It covers the full workflow described in the BDD scenarios: folder scanning and vessel selection preconditions, start/stop time selection with second resolution, robust CSV parsing, optimization to remove spurious points, handling of malformed or incomplete rows, permission gating of the Create action, and user-facing feedback/messages.
 
+**IMPORTANT: Coordinate System** - RouteWaypoint objects store Lat/Lon in **RADIANS** (not degrees). Input CSV files contain coordinates in degrees (e.g., 54.588568°, 11.36605°), which MUST be converted to radians during the waypoint creation process. This ensures compatibility with the XML export format which expects radians values (e.g., 0.725930, -0.527683). The conversion is done using the formula: radians = degrees × π / 180.
+
 Business value: enables analysts and navigators to produce compact, exportable route templates from raw AIS logs so downstream navigation tools can consume concise, relevant waypoints instead of raw noisy telemetry.
 
 User needs addressed:
@@ -43,8 +45,6 @@ User experience strategy: keep UI responsive with progress reporting, disable Cr
 ## File Structure
 
 Follow `docs/tech_design/application_organization.md` patterns. Files added/used for this feature:
-
-```
 src/AISRouting.App.WPF/
   Views/
     ShipSelectionView.xaml          # Vessel combo + static data display (AutomationId: "ship-combo")
@@ -84,8 +84,6 @@ tests/
     Infrastructure/PositionCsvParserTests.cs
   IntegrationTests/
     CreateTrackEndToEndTests.cs     # uses centralized mock fixtures
-```
-
 Purpose comments:
 - `PositionCsvParser.cs` is responsible for defensive parsing and logging of malformed rows and must expose counters (skippedRows) for UI warnings.
 - `TrackResultsViewModel` exposes `IReadOnlyList<RouteWaypoint> GeneratedWaypoints` and `DataQualityNotes` for tests to assert.
@@ -204,8 +202,6 @@ The Douglas-Peucker algorithm is the core geometric optimization technique. It w
 ## Implementation Examples
 
 ### OptimizationParameters Model
-
-```csharp
 public class OptimizationParameters
 {
     // Stage 1: Deviation detection thresholds
@@ -224,11 +220,7 @@ public class OptimizationParameters
     public bool EnforceTemporalSpacing { get; set; } = false;
     public TimeSpan MinTemporalInterval { get; set; } = TimeSpan.FromMinutes(5);
 }
-```
-
 ### TrackOptimizer Multi-Stage Pipeline
-
-```csharp
 public class TrackOptimizer : ITrackOptimizer
 {
     private readonly IDeviationDetector _deviationDetector;
@@ -381,11 +373,7 @@ public class TrackOptimizer : ITrackOptimizer
         throw new NotImplementedException("Timestamp extraction logic");
     }
 }
-```
-
 ### GeoCalculator Implementation
-
-```csharp
 public class GeoCalculator : IGeoCalculator
 {
     private const double EarthRadiusMeters = 6371000.0;
@@ -439,11 +427,7 @@ public class GeoCalculator : IGeoCalculator
     private double ToRadians(double degrees) => degrees * Math.PI / 180.0;
     private double ToDegrees(double radians) => radians * 180.0 / Math.PI;
 }
-```
-
 ### MainViewModel CreateTrack Command
-
-```csharp
 public async Task CreateTrackAsync(CancellationToken token)
 {
     if (SelectedVessel == null) throw new InvalidOperationException("No ship selected");
@@ -461,15 +445,11 @@ public async Task CreateTrackAsync(CancellationToken token)
     StatusMessage = $"Track created: {GeneratedWaypoints.Count} waypoints " +
         $"({reductionPercent:F1}% reduction from {result.Positions.Count()} position reports)";
 }
-```
-
 PositionCsvParser behavior (summary):
 - Use `CsvHelper` with `BadDataFound` and `MissingFieldFound` hooks to log and increment `skippedRows`.
 - Parse to `ShipDataOut` using `ShipDataOutMap` mapping class. Yield only valid `IsValid` records but keep counts and examples of invalid rows for diagnostics.
 
 RouteWaypoint mapping snippet:
-
-```csharp
 public RouteWaypoint Map(ShipDataOut r)
 {
     return new RouteWaypoint
@@ -484,8 +464,6 @@ public RouteWaypoint Map(ShipDataOut r)
         TrackMode = "Track",
     };
 }
-```
-
 All examples use types and registrations from `overall_architecture.md` (e.g., `IShipPositionLoader`, `ITrackOptimizer`) to ensure architectural compliance.
 
 ## Testing Strategy and Quality Assurance
@@ -513,12 +491,8 @@ Mock data requirements (centralized approach):
   - Helper: `getCsvForRange(start, stop)` returns small CSV content matching `ShipDataOut` schema
 - Integration tests import fixtures from `tests/fixtures/` which in turn reference `src/mocks/mockData.ts`.
 
-Example fixture usage (Playwright):
-```ts
-import { mockVessel205196000 } from '../../src/mocks/mockData';
+Example fixture usage (Playwright):import { mockVessel205196000 } from '../../src/mocks/mockData';
 export const createTrackFixture = { vessel: mockVessel205196000 };
-```
-
 Test data fixtures must include:
 - A noisy CSV sample (with spurious lat/lon jumps) to validate narrowed-window behavior and Douglas-Peucker effectiveness
 - A CSV with long straight segments to validate collinearity optimization

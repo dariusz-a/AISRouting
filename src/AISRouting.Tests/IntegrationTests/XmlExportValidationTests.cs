@@ -199,8 +199,8 @@ namespace AISRouting.Tests.IntegrationTests
                 {
                     Index = 0,
                     Name = "205196000",
-                    Lat = 55.67234,
-                    Lon = 12.58456,
+                    Lat = 0.971674,    // 55.67234° in radians
+                    Lon = 0.219574,    // 12.58456° in radians
                     Alt = 0,
                     Speed = 12.5,
                     ETA = 0,
@@ -218,8 +218,8 @@ namespace AISRouting.Tests.IntegrationTests
                 {
                     Index = 1,
                     Name = "205196000",
-                    Lat = 55.68123,
-                    Lon = 12.59234,
+                    Lat = 0.971777,    // 55.68123° in radians
+                    Lon = 0.219795,    // 12.59234° in radians
                     Alt = 0,
                     Speed = 15.3,
                     ETA = 0,
@@ -237,8 +237,8 @@ namespace AISRouting.Tests.IntegrationTests
                 {
                     Index = 2,
                     Name = "205196000",
-                    Lat = 55.69012,
-                    Lon = 12.60123,
+                    Lat = 0.971932,    // 55.69012° in radians
+                    Lon = 0.219989,    // 12.60123° in radians
                     Alt = 0,
                     Speed = 18.7,
                     ETA = 0,
@@ -256,8 +256,8 @@ namespace AISRouting.Tests.IntegrationTests
                 {
                     Index = 3,
                     Name = "205196000",
-                    Lat = 55.69901,
-                    Lon = 12.61012,
+                    Lat = 0.972087,    // 55.69901° in radians
+                    Lon = 0.220166,    // 12.61012° in radians
                     Alt = 0,
                     Speed = 16.2,
                     ETA = 0,
@@ -275,8 +275,8 @@ namespace AISRouting.Tests.IntegrationTests
                 {
                     Index = 4,
                     Name = "205196000",
-                    Lat = 55.70789,
-                    Lon = 12.61901,
+                    Lat = 0.972242,    // 55.70789° in radians
+                    Lon = 0.220343,    // 12.61901° in radians
                     Alt = 0,
                     Speed = 14.8,
                     ETA = 0,
@@ -300,12 +300,18 @@ namespace AISRouting.Tests.IntegrationTests
             
             for (int i = 0; i < 10; i++)
             {
+                // Convert degrees to radians
+                double latDegrees = 55.67 + (i * 0.01);
+                double lonDegrees = 12.58 + (i * 0.01);
+                double latRadians = latDegrees * Math.PI / 180.0;
+                double lonRadians = lonDegrees * Math.PI / 180.0;
+                
                 waypoints.Add(new RouteWaypoint
                 {
                     Index = i,
                     Name = "205196000",
-                    Lat = 55.67 + (i * 0.01),
-                    Lon = 12.58 + (i * 0.01),
+                    Lat = latRadians,
+                    Lon = lonRadians,
                     Alt = 0,
                     Speed = 10 + (i * 0.5),
                     ETA = 0,
