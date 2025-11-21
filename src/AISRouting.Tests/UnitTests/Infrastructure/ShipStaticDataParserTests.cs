@@ -110,5 +110,90 @@ namespace AISRouting.Tests.UnitTests.Infrastructure
             result.Should().NotBeNull();
             result!.FolderPath.Should().Be(_testFolder);
         }
+
+        [Test]
+        public async Task LoadStaticDataAsync_WithNullNumericFields_ReturnsDataWithoutExceptions()
+        {
+            // Arrange
+            var mmsi = "222222222";
+            var jsonPath = Path.Combine(_testFolder, $"{mmsi}.json");
+            var jsonContent = @"{
+                ""MMSI"": 222222222,
+                ""Name"": ""Test Ship"",
+                ""Length"": null,
+                ""Beam"": null,
+                ""Draught"": null,
+                ""TypeCode"": null
+            }";
+            File.WriteAllText(jsonPath, jsonContent);
+
+            // Act
+            var result = await _parser.LoadStaticDataAsync(_testFolder, mmsi);
+
+            // Assert
+            result.Should().NotBeNull();
+            result!.MMSI.Should().Be(222222222);
+            result.Name.Should().Be("Test Ship");
+            result.Length.Should().BeNull();
+            result.Beam.Should().BeNull();
+            result.Draught.Should().BeNull();
+            result.TypeCode.Should().BeNull();
+        }
+
+        [Test]
+        public async Task LoadStaticDataAsync_WithEmptyStringNumericFields_IgnoresInvalidValues()
+        {
+            // Arrange
+            var mmsi = "333333333";
+            var jsonPath = Path.Combine(_testFolder, $"{mmsi}.json");
+            var jsonContent = @"{
+                ""MMSI"": 333333333,
+                ""Name"": ""Test Ship"",
+                ""Length"": """",
+                ""Beam"": """",
+                ""Draught"": """"
+            }";
+            File.WriteAllText(jsonPath, jsonContent);
+
+            // Act
+            var result = await _parser.LoadStaticDataAsync(_testFolder, mmsi);
+
+            // Assert
+            result.Should().NotBeNull();
+            result!.MMSI.Should().Be(333333333);
+            result.Name.Should().Be("Test Ship");
+            result.Length.Should().BeNull();
+            result.Beam.Should().BeNull();
+            result.Draught.Should().BeNull();
+        }
+
+        [Test]
+        public async Task LoadStaticDataAsync_WithMixedValidAndNullFields_ParsesValidFieldsOnly()
+        {
+            // Arrange
+            var mmsi = "444444444";
+            var jsonPath = Path.Combine(_testFolder, $"{mmsi}.json");
+            var jsonContent = @"{
+                ""MMSI"": 444444444,
+                ""Name"": ""Test Ship"",
+                ""Length"": 150.5,
+                ""Beam"": null,
+                ""Draught"": 10.2,
+                ""TypeCode"": 70
+            }";
+            File.WriteAllText(jsonPath, jsonContent);
+
+            // Act
+            var result = await _parser.LoadStaticDataAsync(_testFolder, mmsi);
+
+            // Assert
+            result.Should().NotBeNull();
+            result!.MMSI.Should().Be(444444444);
+            result.Name.Should().Be("Test Ship");
+            result.Length.Should().Be(150.5);
+            result.Beam.Should().BeNull();
+            result.Draught.Should().Be(10.2);
+            result.TypeCode.Should().Be(70);
+        }
     }
 }

@@ -57,13 +57,22 @@ namespace AISRouting.Infrastructure.Parsers
                     staticData.Name = nameElement.GetString();
 
                 if (root.TryGetProperty("length", out var lengthElement) || root.TryGetProperty("Length", out lengthElement))
-                    staticData.Length = lengthElement.GetDouble();
+                {
+                    if (lengthElement.ValueKind == JsonValueKind.Number)
+                        staticData.Length = lengthElement.GetDouble();
+                }
 
                 if (root.TryGetProperty("width", out var beamElement) || root.TryGetProperty("Beam", out beamElement))
-                    staticData.Beam = beamElement.GetDouble();
+                {
+                    if (beamElement.ValueKind == JsonValueKind.Number)
+                        staticData.Beam = beamElement.GetDouble();
+                }
 
                 if (root.TryGetProperty("draught", out var draughtElement) || root.TryGetProperty("Draught", out draughtElement))
-                    staticData.Draught = draughtElement.GetDouble();
+                {
+                    if (draughtElement.ValueKind == JsonValueKind.Number)
+                        staticData.Draught = draughtElement.GetDouble();
+                }
 
                 if (root.TryGetProperty("vesselType", out var typeElement) || root.TryGetProperty("TypeCode", out typeElement))
                 {
